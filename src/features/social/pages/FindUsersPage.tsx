@@ -3,6 +3,8 @@ import { useAuth } from '@/features/auth/hooks/useAuth'
 import { searchUsers } from '@/features/profile/services/profileService'
 import { UserPreview } from '../components/UserPreview'
 import { FriendButton } from '../components/FriendButton'
+import { PageShell } from '@/components/ui/PageShell'
+import { EmptyState } from '@/components/ui/EmptyState'
 import type { UserProfile } from '@/types'
 import styles from './SocialPage.module.css'
 
@@ -24,17 +26,13 @@ export function FindUsersPage() {
   }
 
   return (
-    <div className={styles.page}>
+    <PageShell>
       <h2 className={styles.title}>Найти людей</h2>
 
       <form className={styles.form} onSubmit={handleSearch}>
         <label className={styles.field}>
           <span>Имя пользователя</span>
-          <input
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-            placeholder="Введите ник..."
-          />
+          <input value={query} onChange={(e) => setQuery(e.target.value)} placeholder="Введите ник..." />
         </label>
         <button className={styles.submitBtn} disabled={searching || !query.trim()}>
           {searching ? 'Поиск...' : 'Искать'}
@@ -42,21 +40,17 @@ export function FindUsersPage() {
       </form>
 
       <div className={styles.list} style={{ marginTop: 'var(--spacing-lg)' }}>
-        {searched && results.length === 0 && (
-          <p className={styles.empty}>Ничего не найдено</p>
-        )}
+        {searched && results.length === 0 && <EmptyState message="Ничего не найдено" />}
 
-        {results
-          .filter((p) => p.id !== user?.uid)
-          .map((p) => (
-            <div key={p.id} className={styles.card}>
-              <div className={styles.cardLink}>
-                <UserPreview uid={p.id} size={44} />
-              </div>
-              <FriendButton targetUid={p.id} />
+        {results.filter((p) => p.id !== user?.uid).map((p) => (
+          <div key={p.id} className={styles.card}>
+            <div className={styles.cardLink}>
+              <UserPreview uid={p.id} size={44} />
             </div>
-          ))}
+            <FriendButton targetUid={p.id} />
+          </div>
+        ))}
       </div>
-    </div>
+    </PageShell>
   )
 }

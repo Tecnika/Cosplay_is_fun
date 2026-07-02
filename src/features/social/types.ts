@@ -9,7 +9,6 @@ export interface Friendship {
   id: string
   user1: string
   user2: string
-  /** Кто отправил заявку */
   actionUser: string
   status: FriendshipStatus
   createdAt: number
@@ -23,6 +22,7 @@ export interface Circle {
   avatarURL?: string
   coverURL?: string
   contacts?: string
+  isPrivate: boolean
   createdBy: string
   memberCount: number
   createdAt: number
@@ -37,9 +37,19 @@ export interface CircleMember {
   joinedAt: number
 }
 
+/** Приглашение в круг (подколлекция) */
+export interface CircleInvite {
+  id: string
+  code: string
+  createdBy: string
+  createdAt: number
+  uses: number
+  maxUses?: number
+}
+
 /** Статус дружбы со стороны текущего пользователя */
 export type FriendRelation =
-  | 'none'          // ничего
-  | 'subscribed'    // ты подписался, он ещё нет
-  | 'subscriber'    // он подписался, ты ещё нет
-  | 'friend'        // взаимная дружба
+  | 'none'
+  | 'subscribed'
+  | 'subscriber'
+  | 'friend'

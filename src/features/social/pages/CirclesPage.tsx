@@ -1,42 +1,70 @@
+import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { useAuth } from '@/features/auth/hooks/useAuth'
 import { useCircles } from '../hooks/useCircles'
+import { getPublicCircles } from '../services/circlesService'
+import { PageShell } from '@/components/ui/PageShell'
+import { PageHeader } from '@/components/ui/PageHeader'
+import { CircleAvatar } from '@/components/ui/CircleAvatar'
+import { EmptyState } from '@/components/ui/EmptyState'
+import type { Circle } from '../types'
 import styles from './SocialPage.module.css'
 
 export function CirclesPage() {
   const { user } = useAuth()
-  const { circles, loading } = useCircles(user?.uid)
+  const { circles: myCircles, loading: myLoading } = useCircles(user?.uid)
+  const [publicCircles, setPublicCircles] = useState<Circle[]>([])
+  const [pubLoading, setPubLoading] = useState(true)
 
-  if (loading) return <div className={styles.page}>Загрузка...</div>
-  if (!user) return <div className={styles.page}>Авторизуйтесь</div>
+  useEffect(() => {
+    getPublicCircles().then((c) => { setPublicCircles(c); setPubLoading(false) })
+  }, [])
+
+  const myIds = new Set(myCircles.map((c) => c.id))
+  const otherPublic = publicCircles.filter((c) => !myIds.has(c.id))
 
   return (
-    <div className={styles.page}>
-      <div className={styles.headerRow}>
-        <h2 className={styles.title}>Круги</h2>
-        <Link to="/social/circles/new" className={styles.createBtn}>+ Создать круг</Link>
-      </div>
+    <PageShell loading={myLoading || pubLoading} requiredAuth isAuthenticated={!!user}>
+      <PageHeader title="Круги" action={{ label: '+ Создать круг', to: '/social/circles/new' }} />
 
-      <div className={styles.list}>
-        {circles.length === 0 && (
-          <p className={styles.empty}>У вас пока нет кругов</p>
-        )}
+      {/* Мои круги */}
+      {myCircles.length > 0 && (
+        <section>
+          <h3 className={styles.sectionTitle}>Мои круги</h3>
+          <div className={styles.circleGrid}>
+            {myCircles.map((circle) => (
+              <CircleCard key={circle.id} circle={circle} isMember />
+            ))}
+          </div>
+        </section>
+      )}
 
-        {circles.map((circle) => (
-          <Link key={circle.id} to={`/social/circles/${circle.id}`} className={styles.card}>
-            <div
-              className={styles.circleAvatar}
-              style={circle.avatarURL ? { backgroundImage: `url(${circle.avatarURL})`, backgroundSize: 'cover' } : undefined}
-            >
-              {!circle.avatarURL && circle.name.charAt(0).toUpperCase()}
-            </div>
-            <div className={styles.circleInfo}>
-              <span className={styles.circleName}>{circle.name}</span>
-              <span className={styles.circleMeta}>{circle.memberCount} участников</span>
-            </div>
-          </Link>
-        ))}
+      {/* Все публичные круги */}
+      <section style={{ marginTop: myCircles.length > 0 ? 'var(--spacing-xl)' : 0 }}>
+        <h3 className={styles.sectionTitle}>Все круги</h3>
+        {otherPublic.length === 0 && <EmptyState message="Публичных кругов пока нет" />}
+        <div className={styles.circleGrid}>
+          {otherPublic.map((circle) => (
+            <CircleCard key={circle.id} circle={circle} />
+          ))}
+        </div>
+      </section>
+    </PageShell>
+  )
+}
+
+function CircleCard({ circle, isMember }: { circle: Circle; isMember?: boolean }) {
+  return (
+    <Link to={`/social/circles/${circle.id}`} className={styles.circleCard}>
+      <CircleAvatar name={circle.name} url={circle.avatarURL} size="card" />
+      <div className={styles.circleCardBody}>
+        <div className={styles.circleCardNameRow}>
+          <span className={styles.circleCardName}>{circle.name}</span>
+          {circle.isPrivate && <span className={styles.privateBadge}>Приватный</span>}
+        </div>
+        {circle.description && <p className={styles.circleCardDesc}>{circle.description}</p>}
+        <span className={styles.circleMeta}>{circle.memberCount} участников</span>
       </div>
-    </div>
+    </Link>
   )
 }

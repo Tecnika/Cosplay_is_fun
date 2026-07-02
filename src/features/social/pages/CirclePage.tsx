@@ -1,44 +1,37 @@
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { useParams, useNavigate, Link } from 'react-router-dom'
 import { useAuth } from '@/features/auth/hooks/useAuth'
 import { UserPreview } from '../components/UserPreview'
-import { getCircle, getCircleMembers, joinCircle, leaveCircle, deleteCircle, getMemberRole } from '../services/circlesService'
+import { getCircle, getCircleMembers, joinCircle, leaveCircle, deleteCircle, getMemberRole, createInvite } from '../services/circlesService'
+import { PageShell } from '@/components/ui/PageShell'
+import { CircleAvatar } from '@/components/ui/CircleAvatar'
+import { useAsyncEffect } from '@/hooks/useAsyncEffect'
 import type { Circle, CircleMember, CircleRole } from '../types'
 import styles from './SocialPage.module.css'
 
 export function CirclePage() {
   const { id } = useParams<{ id: string }>()
   const { user, profile } = useAuth()
+  const navigate = useNavigate()
   const [circle, setCircle] = useState<Circle | null>(null)
   const [members, setMembers] = useState<CircleMember[]>([])
   const [myRole, setMyRole] = useState<CircleRole | null>(null)
   const [loading, setLoading] = useState(true)
-  const navigate = useNavigate()
+  const [inviteLink, setInviteLink] = useState('')
 
-  useEffect(() => {
+  useAsyncEffect(async () => {
     if (!id) return
-
-    let cancelled = false
-    async function load() {
-      const [c, m] = await Promise.all([getCircle(id), getCircleMembers(id)])
-      if (!cancelled) {
-        setCircle(c)
-
-        setMembers(m)
-
-        if (user) {
-          const role = await getMemberRole(id, user.uid)
-          setMyRole(role)
-        }
-        setLoading(false)
-      }
+    const [c, m] = await Promise.all([getCircle(id), getCircleMembers(id)])
+    if (c) setCircle(c)
+    setMembers(m)
+    if (user) {
+      const role = await getMemberRole(id, user.uid)
+      setMyRole(role)
     }
-    load()
-    return () => { cancelled = true }
+    setLoading(false)
   }, [id, user])
 
-  if (loading) return <div className={styles.page}>Загрузка...</div>
-  if (!circle) return <div className={styles.page}>Круг не найден</div>
+  if (!circle) return <PageShell loading={loading}>Круг не найден</PageShell>
 
   async function handleJoin() {
     if (!id || !user) return
@@ -61,28 +54,35 @@ export function CirclePage() {
     navigate('/social/circles', { replace: true })
   }
 
+  async function handleInvite() {
+    if (!id || !user) return
+    try {
+      const code = await createInvite(id, user.uid)
+      const link = `${window.location.origin}/Cosplay_is_fun/social/circles/join/${code}`
+      setInviteLink(link)
+      await navigator.clipboard.writeText(link)
+      alert('Ссылка-приглашение скопирована!')
+    } catch {
+      alert('Ошибка создания приглашения')
+    }
+  }
+
   const isMember = myRole !== null
   const canEdit = myRole === 'creator'
 
   return (
-    <div className={styles.page}>
-      {/* Обложка */}
+    <PageShell>
       {circle.coverURL && (
-        <div
-          className={styles.cover}
-          style={{ backgroundImage: `url(${circle.coverURL})` }}
-        />
+        <div className={styles.cover} style={{ backgroundImage: `url(${circle.coverURL})` }} />
       )}
 
       <div className={styles.circleHeader}>
-        <div
-          className={styles.circleBigAvatar}
-          style={circle.avatarURL ? { backgroundImage: `url(${circle.avatarURL})`, backgroundSize: 'cover' } : undefined}
-        >
-          {!circle.avatarURL && circle.name.charAt(0).toUpperCase()}
-        </div>
+        <CircleAvatar name={circle.name} url={circle.avatarURL} size="detail" />
         <div className={styles.circleHeaderInfo}>
-          <h2 className={styles.title}>{circle.name}</h2>
+          <div className={styles.circleTitleRow}>
+            <h2 className={styles.title}>{circle.name}</h2>
+            {circle.isPrivate && <span className={styles.privateBadge}>Приватный</span>}
+          </div>
           {circle.description && <p className={styles.circleDesc}>{circle.description}</p>}
           {circle.contacts && <p className={styles.circleContacts}>{circle.contacts}</p>}
           <span className={styles.circleMeta}>{circle.memberCount} участников</span>
@@ -93,11 +93,15 @@ export function CirclePage() {
           ) : canEdit ? (
             <>
               <span className={styles.roleBadge}>Создатель</span>
+              <button className={styles.createBtn} onClick={handleInvite}>Пригласить</button>
               <Link to={`/social/circles/${id}/settings`} className={styles.createBtn}>Настройки</Link>
               <button className={styles.leaveBtn} onClick={handleDelete}>Удалить круг</button>
             </>
           ) : (
-            <button className={styles.leaveBtn} onClick={handleLeave}>Покинуть</button>
+            <>
+              <button className={styles.leaveBtn} onClick={handleLeave}>Покинуть</button>
+              <button className={styles.createBtn} onClick={handleInvite}>Пригласить</button>
+            </>
           )}
         </div>
       </div>
@@ -117,6 +121,6 @@ export function CirclePage() {
           </div>
         ))}
       </div>
-    </div>
+    </PageShell>
   )
 }

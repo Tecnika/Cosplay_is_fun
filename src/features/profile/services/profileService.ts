@@ -1,5 +1,6 @@
 import { doc, getDoc, updateDoc, serverTimestamp, query, where, orderBy, limit, getDocs, collection } from 'firebase/firestore'
 import { getFirebaseDb } from '@/services/firebase'
+import { haveCommonCircle } from '@/features/social/services/circlesService'
 import type { UserProfile, PrivacyLevel } from '@/types'
 
 /** Загружает профиль по ID */
@@ -48,12 +49,14 @@ export function isFieldVisible(
   privacy: PrivacyLevel | undefined,
   viewerRole: 'self' | 'superadmin' | 'other',
   isFriend?: boolean,
+  hasCommonCircle?: boolean,
 ): boolean {
   if (viewerRole === 'self') return true
   if (viewerRole === 'superadmin') return true
 
   if (privacy === 'public' || !privacy) return true
   if (privacy === 'friends' && isFriend) return true
-  // privacy = friends/ circle/ private — не показываем
+  if (privacy === 'circle' && hasCommonCircle) return true
+
   return false
 }

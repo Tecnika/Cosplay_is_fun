@@ -158,21 +158,6 @@
   color: var(--color-accent);
 }
 
-.circleMiniAvatar {
-  width: 20px;
-  height: 20px;
-  border-radius: var(--radius-full);
-  background: var(--gradient-primary);
-  color: white;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 0.6rem;
-  font-weight: 700;
-  background-size: cover;
-  flex-shrink: 0;
-}
-
 .circleMiniName {
   font-weight: 500;
 }

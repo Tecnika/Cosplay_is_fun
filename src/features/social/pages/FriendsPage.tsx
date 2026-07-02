@@ -1,9 +1,11 @@
 import { useState } from 'react'
-import { Link } from 'react-router-dom'
 import { useAuth } from '@/features/auth/hooks/useAuth'
 import { UserPreview } from '../components/UserPreview'
 import { useFriends } from '../hooks/useFriends'
 import { acceptFriendRequest, removeFriendship } from '../services/friendsService'
+import { PageShell } from '@/components/ui/PageShell'
+import { PageHeader } from '@/components/ui/PageHeader'
+import { EmptyState } from '@/components/ui/EmptyState'
 import styles from './SocialPage.module.css'
 
 type Tab = 'friends' | 'incoming' | 'outgoing'
@@ -13,17 +15,14 @@ export function FriendsPage() {
   const { friends, incoming, outgoing, loading } = useFriends(user?.uid)
   const [tab, setTab] = useState<Tab>('friends')
 
-  if (loading) return <div className={styles.page}>Загрузка...</div>
-  if (!user) return <div className={styles.page}>Авторизуйтесь</div>
+  if (!user) return <PageShell requiredAuth isAuthenticated={false} />
 
   async function handleAccept(friendId: string) {
-    if (!user) return
     await acceptFriendRequest(user.uid, friendId)
     window.location.reload()
   }
 
   async function handleRemove(friendId: string) {
-    if (!user) return
     await removeFriendship(user.uid, friendId)
     window.location.reload()
   }
@@ -37,11 +36,8 @@ export function FriendsPage() {
   const currentList = tab === 'friends' ? friends : tab === 'incoming' ? incoming : outgoing
 
   return (
-    <div className={styles.page}>
-      <div className={styles.headerRow}>
-        <h2 className={styles.title}>Друзья</h2>
-        <Link to="/social/friends/find" className={styles.createBtn}>+ Найти людей</Link>
-      </div>
+    <PageShell loading={loading}>
+      <PageHeader title="Друзья" action={{ label: '+ Найти людей', to: '/social/friends/find' }} />
 
       <div className={styles.tabs}>
         {tabs.map((t) => (
@@ -58,11 +54,9 @@ export function FriendsPage() {
 
       <div className={styles.list}>
         {currentList.length === 0 && (
-          <p className={styles.empty}>
-            {tab === 'friends' ? 'Пока нет друзей' :
-             tab === 'incoming' ? 'Нет входящих заявок' :
-             'Нет исходящих заявок'}
-          </p>
+          <EmptyState
+            message={tab === 'friends' ? 'Пока нет друзей' : tab === 'incoming' ? 'Нет входящих заявок' : 'Нет исходящих заявок'}
+          />
         )}
 
         {currentList.map((item) => (
@@ -81,6 +75,6 @@ export function FriendsPage() {
           </div>
         ))}
       </div>
-    </div>
+    </PageShell>
   )
 }

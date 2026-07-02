@@ -13,6 +13,7 @@ import { CirclesPage } from '@/features/social/pages/CirclesPage'
 import { CircleNewPage } from '@/features/social/pages/CircleNewPage'
 import { CirclePage } from '@/features/social/pages/CirclePage'
 import { CircleSettingsPage } from '@/features/social/pages/CircleSettingsPage'
+import { CircleJoinPage } from '@/features/social/pages/CircleJoinPage'
 import { NotFound } from '@/pages/NotFound'
 
 function RedirectHandler() {
@@ -46,6 +47,7 @@ export function App() {
             <Route path="/social/friends/find" element={<FindUsersPage />} />
             <Route path="/social/circles" element={<CirclesPage />} />
             <Route path="/social/circles/new" element={<CircleNewPage />} />
+            <Route path="/social/circles/join/:code" element={<CircleJoinPage />} />
             <Route path="/social/circles/:id" element={<CirclePage />} />
             <Route path="/social/circles/:id/settings" element={<CircleSettingsPage />} />
             <Route path="/gallery" element={<div>Галерея (в разработке)</div>} />

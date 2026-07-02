@@ -1,0 +1,30 @@
+.avatar {
+  background: var(--gradient-primary);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.cardSize {
+  width: 48px;
+  height: 48px;
+  border-radius: var(--radius-lg);
+  font-size: 1.3rem;
+}
+
+.detailSize {
+  width: 80px;
+  height: 80px;
+  border-radius: var(--radius-lg);
+  font-size: 2rem;
+}
+
+.miniSize {
+  width: 20px;
+  height: 20px;
+  border-radius: var(--radius-full);
+  font-size: 0.6rem;
+}

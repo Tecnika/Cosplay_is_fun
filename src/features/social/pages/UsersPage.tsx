@@ -4,6 +4,8 @@ import { UserPreview } from '../components/UserPreview'
 import { FriendButton } from '../components/FriendButton'
 import { getDocs, collection } from 'firebase/firestore'
 import { getFirebaseDb } from '@/services/firebase'
+import { PageShell } from '@/components/ui/PageShell'
+import { EmptyState } from '@/components/ui/EmptyState'
 import type { UserProfile } from '@/types'
 import styles from './SocialPage.module.css'
 
@@ -23,25 +25,21 @@ export function UsersPage() {
   }, [])
 
   return (
-    <div className={styles.page}>
+    <PageShell loading={loading}>
       <h2 className={styles.title}>Участники проекта</h2>
 
       <div className={styles.grid}>
-        {loading && <p className={styles.empty}>Загрузка...</p>}
+        {!loading && users.length === 0 && <EmptyState message="Пока нет участников" />}
 
-        {!loading && users.length === 0 && <p className={styles.empty}>Пока нет участников</p>}
-
-        {users
-          .filter((p) => p.id !== user?.uid)
-          .map((p) => (
-            <div key={p.id} className={styles.userCard}>
-              <div className={styles.userCardLink}>
-                <UserPreview uid={p.id} size={56} />
-              </div>
-              <FriendButton targetUid={p.id} />
+        {users.filter((p) => p.id !== user?.uid).map((p) => (
+          <div key={p.id} className={styles.userCard}>
+            <div className={styles.userCardLink}>
+              <UserPreview uid={p.id} size={56} />
             </div>
-          ))}
+            <FriendButton targetUid={p.id} />
+          </div>
+        ))}
       </div>
-    </div>
+    </PageShell>
   )
 }

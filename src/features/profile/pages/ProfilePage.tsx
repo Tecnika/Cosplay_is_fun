@@ -7,8 +7,9 @@ import { useProfile } from '../hooks/useProfile'
 import { getProfileByUsername, updateProfile, isFieldVisible } from '../services/profileService'
 import { FriendButton } from '@/features/social/components/FriendButton'
 import { UserPreview } from '@/features/social/components/UserPreview'
-import { getFriendship, getUserFriendships, getFriendId, getFriendRelation } from '@/features/social/services/friendsService'
-import { getUserCircles } from '@/features/social/services/circlesService'
+import { CircleAvatar } from '@/components/ui/CircleAvatar'
+import { getFriendship, getUserFriendships, getFriendId } from '@/features/social/services/friendsService'
+import { getUserCircles, haveCommonCircle } from '@/features/social/services/circlesService'
 import type { PrivacyLevel, UserProfile, Friendship } from '@/types'
 import type { Circle } from '@/features/social/types'
 import { PRIVACY_LABELS } from '../types'
@@ -28,6 +29,7 @@ export function ProfilePage() {
   const [otherLoading, setOtherLoading] = useState(false)
 
   const [isFriend, setIsFriend] = useState(false)
+  const [hasCommonCircle, setHasCommonCircle] = useState(false)
   const [profileFriends, setProfileFriends] = useState<Friendship[]>([])
   const [profileCircles, setProfileCircles] = useState<Circle[]>([])
 
@@ -57,11 +59,14 @@ export function ProfilePage() {
         if (user && profile && user.uid !== profile.id) {
           const f = await getFriendship(user.uid, profile.id)
           setIsFriend(f?.status === 'accepted')
+          const common = await haveCommonCircle(user.uid, profile.id)
+          setHasCommonCircle(common)
         }
       }).finally(() => setOtherLoading(false))
     } else {
       setOtherProfile(null)
       setIsFriend(false)
+      setHasCommonCircle(false)
       setProfileFriends([])
       setProfileCircles([])
     }
@@ -216,12 +221,7 @@ export function ProfilePage() {
                   <div className={styles.circlesRow}>
                     {profileCircles.slice(0, 3).map((c) => (
                       <Link key={c.id} to={`/social/circles/${c.id}`} className={styles.circleMini}>
-                        <div
-                          className={styles.circleMiniAvatar}
-                          style={c.avatarURL ? { backgroundImage: `url(${c.avatarURL})` } : undefined}
-                        >
-                          {!c.avatarURL && c.name.charAt(0).toUpperCase()}
-                        </div>
+                        <CircleAvatar name={c.name} url={c.avatarURL} size="mini" />
                         <span className={styles.circleMiniName}>{c.name}</span>
                       </Link>
                     ))}
@@ -249,7 +249,7 @@ export function ProfilePage() {
   // ---------- Вспомогательные функции ----------
   function renderField(label: string, value: string | null, privacy?: PrivacyLevel) {
     if (!value) return null
-    if (!isFieldVisible(privacy, viewMode, isFriend)) {
+    if (!isFieldVisible(privacy, viewMode, isFriend, hasCommonCircle)) {
       return (
         <div className={styles.infoRow}>
           <span className={styles.infoLabel}>{label}</span>
