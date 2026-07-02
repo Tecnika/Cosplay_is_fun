@@ -1,0 +1,25 @@
+.footer {
+  margin-top: auto;
+  border-top: 1px solid var(--color-border);
+  background-color: var(--color-bg-secondary);
+  transition: background-color var(--transition-normal);
+}
+
+.inner {
+  max-width: var(--max-width);
+  margin: 0 auto;
+  padding: var(--spacing-lg) var(--spacing-md);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.copy {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-tertiary);
+}
+
+.made {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-tertiary);
+}
