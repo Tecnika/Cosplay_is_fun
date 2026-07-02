@@ -10,7 +10,7 @@
 /* Двухколоночный макет */
 .profileGrid {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: 1fr 2fr;
   gap: var(--spacing-xl);
   max-width: 900px;
   margin: 0 auto;
