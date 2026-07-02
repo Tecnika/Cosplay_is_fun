@@ -4,6 +4,9 @@ import { App } from './App'
 import { initFirebase } from './services/firebase'
 import './index.css'
 
+// Подавляем баннер Firebase Dev Mode
+localStorage.setItem('firebase:devmode', 'false')
+
 /** Проверяем, что .env настроен */
 const requiredEnvVars = [
   'VITE_FIREBASE_API_KEY',
