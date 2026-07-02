@@ -1,6 +1,7 @@
 import { useState, type FormEvent } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '../hooks/useAuth'
+import { getFirebaseErrorMessage } from '@/utils/firebaseErrors'
 import styles from './AuthPage.module.css'
 
 export function LoginPage() {
@@ -21,8 +22,7 @@ export function LoginPage() {
       await authLogin(login, password)
       navigate('/profile', { replace: true })
     } catch (err: unknown) {
-      const msg = err instanceof Error ? err.message : 'Ошибка входа'
-      setError(msg)
+      setError(getFirebaseErrorMessage(err))
     }
   }
 
@@ -35,8 +35,7 @@ export function LoginPage() {
       setResetSent(true)
       setError(`Письмо отправлено на ${email}`)
     } catch (err: unknown) {
-      const msg = err instanceof Error ? err.message : 'Ошибка'
-      setError(msg)
+      setError(getFirebaseErrorMessage(err))
     }
   }
 

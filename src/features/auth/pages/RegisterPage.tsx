@@ -1,6 +1,7 @@
 import { useState, type FormEvent } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '../hooks/useAuth'
+import { getFirebaseErrorMessage } from '@/utils/firebaseErrors'
 import styles from './AuthPage.module.css'
 
 export function RegisterPage() {
@@ -26,12 +27,10 @@ export function RegisterPage() {
     }
 
     try {
-      // Передаём email только если он заполнен
       await register(displayName, password, email || undefined)
       navigate('/profile', { replace: true })
     } catch (err: unknown) {
-      const msg = err instanceof Error ? err.message : 'Ошибка регистрации'
-      setError(msg)
+      setError(getFirebaseErrorMessage(err))
     }
   }
 
