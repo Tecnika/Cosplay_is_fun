@@ -2,7 +2,7 @@ import { createContext, useState, useEffect, useCallback, type ReactNode } from 
 import { onAuthStateChanged, type User } from 'firebase/auth'
 import { getFirebaseAuth } from '@/services/firebase'
 import type { UserProfile } from '@/types'
-import { getUserProfile, loginUser, registerUser, logoutUser } from '../services/authService'
+import { getUserProfile, loginUser, registerUser, logoutUser, resetPasswordByLogin } from '../services/authService'
 import type { AuthProfile } from '../services/authService'
 
 /**
@@ -25,6 +25,8 @@ export interface AuthContextValue {
   register: (displayName: string, password: string, email?: string) => Promise<AuthProfile>
   /** Функция выхода */
   logout: () => Promise<void>
+  /** Сброс пароля (принимает username или email) */
+  resetPassword: (login: string) => Promise<string>
   /** Обновить профиль вручную */
   refreshProfile: () => Promise<void>
 }
@@ -87,6 +89,10 @@ export function AuthProvider({ children }: AuthProviderProps) {
     setProfile(null)
   }, [])
 
+  const resetPassword = useCallback(async (login: string) => {
+    return resetPasswordByLogin(login)
+  }, [])
+
   const value: AuthContextValue = {
     user,
     profile,
@@ -95,6 +101,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
     login,
     register,
     logout,
+    resetPassword,
     refreshProfile,
   }
 

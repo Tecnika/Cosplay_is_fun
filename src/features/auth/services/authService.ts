@@ -143,10 +143,26 @@ export async function logoutUser(): Promise<void> {
   await signOut(auth)
 }
 
-/** Сброс пароля */
+/** Сброс пароля по email */
 export async function resetPassword(email: string): Promise<void> {
   const auth = getFirebaseAuth()
   await sendPasswordResetEmail(auth, email)
+}
+
+/** Сброс пароля по логину (username или email) */
+export async function resetPasswordByLogin(login: string): Promise<string> {
+  let authEmail = login
+
+  if (!login.includes('@')) {
+    const found = await findEmailByUsername(login)
+    if (!found) {
+      throw new Error('Пользователь с таким именем не найден')
+    }
+    authEmail = found
+  }
+
+  await resetPassword(authEmail)
+  return authEmail
 }
 
 /** Загружает профиль из Firestore */
