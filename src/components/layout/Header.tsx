@@ -1,15 +1,18 @@
 import { Link } from 'react-router-dom'
 import type { Theme } from '@/types'
+import { Avatar } from '@/features/profile/components/Avatar'
 import styles from './Header.module.css'
 
 interface HeaderProps {
   theme: Theme
   onToggleTheme: () => void
   isAuthenticated: boolean
+  userName?: string
+  userAvatar?: string
   onLogout?: () => void
 }
 
-export function Header({ theme, onToggleTheme, isAuthenticated, onLogout }: HeaderProps) {
+export function Header({ theme, onToggleTheme, isAuthenticated, userName, userAvatar, onLogout }: HeaderProps) {
   return (
     <header className={styles.header}>
       <div className={styles.inner}>
@@ -34,7 +37,10 @@ export function Header({ theme, onToggleTheme, isAuthenticated, onLogout }: Head
 
           {isAuthenticated ? (
             <>
-              <Link to="/profile" className={styles.profileBtn}>Профиль</Link>
+              <Link to="/profile" className={styles.profileLink}>
+                <Avatar name={userName || ''} url={userAvatar} size={32} />
+                <span className={styles.nick}>{userName}</span>
+              </Link>
               <button onClick={onLogout} className={styles.logoutBtn}>Выйти</button>
             </>
           ) : (

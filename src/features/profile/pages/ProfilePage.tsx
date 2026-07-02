@@ -17,7 +17,6 @@ export function ProfilePage() {
   const [saving, setSaving] = useState(false)
   const [saveError, setSaveError] = useState('')
 
-  // Форма
   const [firstName, setFirstName] = useState('')
   const [lastName, setLastName] = useState('')
   const [birthDate, setBirthDate] = useState('')
@@ -26,19 +25,20 @@ export function ProfilePage() {
   const [privacies, setPrivacies] = useState<Record<string, PrivacyLevel>>({})
 
   const currentName = authProfile?.displayName || user?.displayName || 'Пользователь'
+  const p = profile || authProfile
 
   function startEditing() {
-    setFirstName(profile?.firstName || '')
-    setLastName(profile?.lastName || '')
-    setBirthDate(profile?.birthDate || '')
-    setBio(profile?.bio || '')
-    setPhotoURL(profile?.photoURL || '')
+    setFirstName(p?.firstName || '')
+    setLastName(p?.lastName || '')
+    setBirthDate(p?.birthDate || '')
+    setBio(p?.bio || '')
+    setPhotoURL(p?.photoURL || '')
     setPrivacies({
-      firstName: profile?.firstNamePrivacy || 'public',
-      lastName: profile?.lastNamePrivacy || 'public',
-      birthDate: profile?.birthDatePrivacy || 'public',
-      bio: profile?.bioPrivacy || 'public',
-      photo: profile?.photoPrivacy || 'public',
+      firstName: p?.firstNamePrivacy || 'public',
+      lastName: p?.lastNamePrivacy || 'public',
+      birthDate: p?.birthDatePrivacy || 'public',
+      bio: p?.bioPrivacy || 'public',
+      photo: p?.photoPrivacy || 'public',
     })
     setEditing(true)
   }
@@ -48,7 +48,6 @@ export function ProfilePage() {
     setSaving(true)
     setSaveError('')
 
-    // Убираем пустые строки, чтобы Firestore не ругался на undefined
     const data: Record<string, unknown> = {}
     if (firstName) data.firstName = firstName
     if (lastName) data.lastName = lastName
@@ -80,18 +79,19 @@ export function ProfilePage() {
   if (loading) return <div className={styles.page}>Загрузка...</div>
   if (!user) return <div className={styles.page}>Авторизуйтесь для просмотра профиля</div>
 
+  // ---------- Режим редактирования ----------
   if (editing) {
     return (
       <div className={styles.page}>
         <div className={styles.card}>
           <h2 className={styles.title}>Редактирование профиля</h2>
 
-          <div className={styles.form}>
-            {renderField('Фото (URL)', photoURL, setPhotoURL, 'photo')}
-            {renderField('Имя', firstName, setFirstName, 'firstName')}
-            {renderField('Фамилия', lastName, setLastName, 'lastName')}
-            {renderField('Дата рождения', birthDate, setBirthDate, 'birthDate', 'date')}
-            {renderTextArea('О себе', bio, setBio, 'bio')}
+          <div className={styles.editForm}>
+            {editField('Фото (URL)', photoURL, setPhotoURL, 'photo')}
+            {editField('Имя', firstName, setFirstName, 'firstName')}
+            {editField('Фамилия', lastName, setLastName, 'lastName')}
+            {editField('Дата рождения', birthDate, setBirthDate, 'birthDate', 'date')}
+            {editTextArea('О себе', bio, setBio, 'bio')}
 
             {saveError && <div className={styles.error}>{saveError}</div>}
 
@@ -107,43 +107,73 @@ export function ProfilePage() {
     )
   }
 
+  // ---------- Просмотр профиля ----------
+  const fullName = [p?.firstName, p?.lastName].filter(Boolean).join(' ')
+  const formattedDate = p?.birthDate ? new Date(p.birthDate).toLocaleDateString('ru-RU') : null
+
   return (
     <div className={styles.page}>
-      <div className={styles.card}>
-        <div className={styles.header}>
-          <Avatar name={currentName} url={profile?.photoURL} size={80} />
-          <div className={styles.headerInfo}>
-            <h2 className={styles.nick}>{currentName}</h2>
-            <span className={styles.role}>{authProfile?.role}</span>
+      <div className={styles.profileGrid}>
+        {/* Левая колонка */}
+        <div className={styles.leftCol}>
+          <div className={styles.avatarSection}>
+            <Avatar name={currentName} url={p?.photoURL} size={120} />
+            <button className={styles.editIconBtn} onClick={startEditing} title="Редактировать профиль">✏️</button>
           </div>
-          <button className={styles.editBtn} onClick={startEditing}>Редактировать</button>
+
+          <div className={styles.nickRow}>
+            <h1 className={styles.nick}>{currentName}</h1>
+          </div>
+
+          {fullName && (
+            <div className={styles.infoRow}>
+              <span className={styles.infoLabel}>Имя</span>
+              <span className={styles.infoValue}>
+                {fullName}
+                <PrivacyBadge level={p?.firstNamePrivacy || 'public'} />
+              </span>
+            </div>
+          )}
+
+          {formattedDate && (
+            <div className={styles.infoRow}>
+              <span className={styles.infoLabel}>Дата рождения</span>
+              <span className={styles.infoValue}>
+                {formattedDate}
+                <PrivacyBadge level={p?.birthDatePrivacy || 'public'} />
+              </span>
+            </div>
+          )}
+
+          <div className={styles.projectsSection}>
+            <h3 className={styles.sectionTitle}>Проекты</h3>
+            <p className={styles.placeholder}>Создайте первый косплей-проект в Планировщике</p>
+          </div>
         </div>
 
-        <div className={styles.fields}>
-          {renderFieldDisplay('Имя', profile?.firstName, profile?.firstNamePrivacy)}
-          {renderFieldDisplay('Фамилия', profile?.lastName, profile?.lastNamePrivacy)}
-          {renderFieldDisplay('Дата рождения', profile?.birthDate, profile?.birthDatePrivacy, 'date')}
-          {renderFieldDisplay('О себе', profile?.bio, profile?.bioPrivacy)}
+        {/* Правая колонка */}
+        <div className={styles.rightCol}>
+          {p?.bio && (
+            <div className={styles.bioSection}>
+              <h3 className={styles.sectionTitle}>О себе</h3>
+              <p className={styles.bio}>
+                {p.bio}
+                <PrivacyBadge level={p?.bioPrivacy || 'public'} />
+              </p>
+            </div>
+          )}
+
+          <div className={styles.socialSection}>
+            <h3 className={styles.sectionTitle}>Друзья и круги</h3>
+            <p className={styles.placeholder}>Здесь будут друзья и круги общения</p>
+          </div>
         </div>
       </div>
     </div>
   )
 
-  function renderFieldDisplay(label: string, value: string | undefined, privacy?: PrivacyLevel, type?: string) {
-    if (!value && !editing) return null
-    const displayValue = type === 'date' && value ? new Date(value).toLocaleDateString('ru-RU') : value
-    return (
-      <div className={styles.field}>
-        <span className={styles.fieldLabel}>
-          {label}
-          {privacy && <PrivacyBadge level={privacy} />}
-        </span>
-        <span className={styles.fieldValue}>{displayValue || '—'}</span>
-      </div>
-    )
-  }
-
-  function renderField(
+  // ---------- Вспомогательные функции ----------
+  function editField(
     label: string,
     value: string,
     onChange: (v: string) => void,
@@ -151,9 +181,9 @@ export function ProfilePage() {
     type: string = 'text',
   ) {
     return (
-      <label className={styles.field}>
-        <span className={styles.fieldLabel}>{label}</span>
-        <div className={styles.fieldRow}>
+      <label className={styles.editField}>
+        <span className={styles.editLabel}>{label}</span>
+        <div className={styles.editRow}>
           <input
             className={styles.input}
             type={type}
@@ -175,11 +205,11 @@ export function ProfilePage() {
     )
   }
 
-  function renderTextArea(label: string, value: string, onChange: (v: string) => void, privacyKey: string) {
+  function editTextArea(label: string, value: string, onChange: (v: string) => void, privacyKey: string) {
     return (
-      <label className={styles.field}>
-        <span className={styles.fieldLabel}>{label}</span>
-        <div className={styles.fieldRow}>
+      <label className={styles.editField}>
+        <span className={styles.editLabel}>{label}</span>
+        <div className={styles.editRow}>
           <textarea
             className={styles.textarea}
             value={value}
