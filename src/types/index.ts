@@ -8,6 +8,7 @@ export interface UserProfile {
   id: string
   email: string
   displayName: string
+  role: Role
   photoURL?: string
   bio?: string
   // Доп. данные косплеера
@@ -80,6 +81,15 @@ export interface Comment {
   text: string
   createdAt: number
 }
+
+/**
+ * Роль пользователя в системе.
+ * superadmin — полный доступ, назначает админов
+ * admin — управление контентом и пользователями
+ * moderator — модерация постов и комментариев
+ * user — базовый функционал (по умолчанию)
+ */
+export type Role = 'superadmin' | 'admin' | 'moderator' | 'user'
 
 /**
  * Тема оформления сайта.

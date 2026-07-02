@@ -2,25 +2,19 @@ import { Outlet } from 'react-router-dom'
 import { Header } from './Header'
 import { Footer } from './Footer'
 import { useTheme } from '@/hooks/useTheme'
+import { useAuth } from '@/features/auth/hooks/useAuth'
 import styles from './Layout.module.css'
-
-/**
- * Основной макет приложения.
- * Содержит Header, основную область (Outlet) и Footer.
- */
-
-// TODO: заменить на реальный статус авторизации
-const MOCK_AUTH = false
 
 export function Layout() {
   const { theme, toggleTheme } = useTheme()
+  const { isAuthenticated } = useAuth()
 
   return (
     <>
       <Header
         theme={theme}
         onToggleTheme={toggleTheme}
-        isAuthenticated={MOCK_AUTH}
+        isAuthenticated={isAuthenticated}
       />
       <main className={styles.main}>
         <Outlet />
