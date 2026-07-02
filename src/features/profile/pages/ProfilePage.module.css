@@ -189,3 +189,11 @@
 .cancelBtn:hover {
   border-color: var(--color-accent);
 }
+
+.error {
+  padding: var(--spacing-sm) var(--spacing-md);
+  background-color: var(--color-error);
+  color: white;
+  border-radius: var(--radius-md);
+  font-size: var(--font-size-sm);
+}

@@ -15,6 +15,7 @@ export function ProfilePage() {
   const { profile, loading } = useProfile(user?.uid)
   const [editing, setEditing] = useState(false)
   const [saving, setSaving] = useState(false)
+  const [saveError, setSaveError] = useState('')
 
   // Форма
   const [firstName, setFirstName] = useState('')
@@ -45,23 +46,28 @@ export function ProfilePage() {
   async function handleSave() {
     if (!user) return
     setSaving(true)
+    setSaveError('')
+
+    // Убираем пустые строки, чтобы Firestore не ругался на undefined
+    const data: Record<string, unknown> = {}
+    if (firstName) data.firstName = firstName
+    if (lastName) data.lastName = lastName
+    if (birthDate) data.birthDate = birthDate
+    if (bio) data.bio = bio
+    if (photoURL) data.photoURL = photoURL
+    data.firstNamePrivacy = privacies.firstName
+    data.lastNamePrivacy = privacies.lastName
+    data.birthDatePrivacy = privacies.birthDate
+    data.bioPrivacy = privacies.bio
+    data.photoPrivacy = privacies.photo
+
     try {
-      await updateProfile(user.uid, {
-        firstName,
-        lastName,
-        birthDate: birthDate || undefined,
-        bio,
-        photoURL: photoURL || undefined,
-        firstNamePrivacy: privacies.firstName,
-        lastNamePrivacy: privacies.lastName,
-        birthDatePrivacy: privacies.birthDate,
-        bioPrivacy: privacies.bio,
-        photoPrivacy: privacies.photo,
-      })
+      await updateProfile(user.uid, data)
       await refreshProfile()
       setEditing(false)
     } catch (err) {
-      console.error(err)
+      const msg = err instanceof Error ? err.message : 'Ошибка сохранения'
+      setSaveError(msg)
     } finally {
       setSaving(false)
     }
@@ -86,6 +92,8 @@ export function ProfilePage() {
             {renderField('Фамилия', lastName, setLastName, 'lastName')}
             {renderField('Дата рождения', birthDate, setBirthDate, 'birthDate', 'date')}
             {renderTextArea('О себе', bio, setBio, 'bio')}
+
+            {saveError && <div className={styles.error}>{saveError}</div>}
 
             <div className={styles.actions}>
               <button className={styles.saveBtn} onClick={handleSave} disabled={saving}>
