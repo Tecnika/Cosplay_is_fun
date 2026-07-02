@@ -4,10 +4,10 @@ import { useAuth } from '../hooks/useAuth'
 import styles from './AuthPage.module.css'
 
 export function LoginPage() {
-  const [email, setEmail] = useState('')
+  const [login, setLogin] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
-  const { login } = useAuth()
+  const { login: authLogin } = useAuth()
   const navigate = useNavigate()
 
   async function handleSubmit(e: FormEvent) {
@@ -15,7 +15,7 @@ export function LoginPage() {
     setError('')
 
     try {
-      await login(email, password)
+      await authLogin(login, password)
       navigate('/profile', { replace: true })
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : 'Ошибка входа'
@@ -32,12 +32,12 @@ export function LoginPage() {
           {error && <div className={styles.error}>{error}</div>}
 
           <label className={styles.field}>
-            <span>Email</span>
+            <span>Имя пользователя или Email</span>
             <input
-              type="email"
-              placeholder="cosplayer@mail.ru"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              type="text"
+              placeholder="Ваш ник или email"
+              value={login}
+              onChange={(e) => setLogin(e.target.value)}
               required
             />
           </label>

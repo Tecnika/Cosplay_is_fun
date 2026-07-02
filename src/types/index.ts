@@ -6,7 +6,7 @@
  */
 export interface UserProfile {
   id: string
-  email: string
+  email?: string
   displayName: string
   role: Role
   photoURL?: string

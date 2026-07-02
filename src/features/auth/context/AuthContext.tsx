@@ -19,10 +19,10 @@ export interface AuthContextValue {
   loading: boolean
   /** Авторизован ли пользователь */
   isAuthenticated: boolean
-  /** Функция входа */
-  login: (email: string, password: string) => Promise<AuthProfile>
+  /** Функция входа (login = username или email) */
+  login: (login: string, password: string) => Promise<AuthProfile>
   /** Функция регистрации */
-  register: (email: string, password: string, displayName: string) => Promise<AuthProfile>
+  register: (displayName: string, password: string, email?: string) => Promise<AuthProfile>
   /** Функция выхода */
   logout: () => Promise<void>
   /** Обновить профиль вручную */
@@ -67,15 +67,15 @@ export function AuthProvider({ children }: AuthProviderProps) {
     return unsubscribe
   }, [])
 
-  const login = useCallback(async (email: string, password: string) => {
-    const result = await loginUser(email, password)
+  const login = useCallback(async (login: string, password: string) => {
+    const result = await loginUser(login, password)
     setUser(result.user)
     setProfile(result.profile)
     return result
   }, [])
 
-  const register = useCallback(async (email: string, password: string, displayName: string) => {
-    const result = await registerUser(email, password, displayName)
+  const register = useCallback(async (displayName: string, password: string, email?: string) => {
+    const result = await registerUser(displayName, password, email)
     setUser(result.user)
     setProfile(result.profile)
     return result

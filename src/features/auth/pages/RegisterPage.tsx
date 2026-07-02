@@ -4,9 +4,9 @@ import { useAuth } from '../hooks/useAuth'
 import styles from './AuthPage.module.css'
 
 export function RegisterPage() {
-  const [email, setEmail] = useState('')
-  const [password, setPassword] = useState('')
   const [displayName, setDisplayName] = useState('')
+  const [password, setPassword] = useState('')
+  const [email, setEmail] = useState('')
   const [error, setError] = useState('')
   const { register } = useAuth()
   const navigate = useNavigate()
@@ -15,13 +15,19 @@ export function RegisterPage() {
     e.preventDefault()
     setError('')
 
+    if (displayName.length < 2) {
+      setError('Имя должно быть минимум 2 символа')
+      return
+    }
+
     if (password.length < 6) {
       setError('Пароль должен быть минимум 6 символов')
       return
     }
 
     try {
-      await register(email, password, displayName)
+      // Передаём email только если он заполнен
+      await register(displayName, password, email || undefined)
       navigate('/profile', { replace: true })
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : 'Ошибка регистрации'
@@ -38,36 +44,36 @@ export function RegisterPage() {
           {error && <div className={styles.error}>{error}</div>}
 
           <label className={styles.field}>
-            <span>Имя (никнейм)</span>
+            <span>Имя пользователя *</span>
             <input
               type="text"
-              placeholder="Ваш ник"
+              placeholder="Ваш никнейм"
               value={displayName}
               onChange={(e) => setDisplayName(e.target.value)}
+              minLength={2}
               required
             />
           </label>
 
           <label className={styles.field}>
-            <span>Email</span>
+            <span>Пароль *</span>
+            <input
+              type="password"
+              placeholder="Минимум 6 символов"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              minLength={6}
+              required
+            />
+          </label>
+
+          <label className={styles.field}>
+            <span>Email (необязательно)</span>
             <input
               type="email"
               placeholder="cosplayer@mail.ru"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              required
-            />
-          </label>
-
-          <label className={styles.field}>
-            <span>Пароль (минимум 6 символов)</span>
-            <input
-              type="password"
-              placeholder="••••••"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              minLength={6}
-              required
             />
           </label>
 

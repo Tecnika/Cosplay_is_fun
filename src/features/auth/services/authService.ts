@@ -6,44 +6,61 @@ import {
   updateProfile,
   type User,
 } from 'firebase/auth'
-import { doc, getDoc, setDoc, serverTimestamp } from 'firebase/firestore'
+import { doc, getDoc, setDoc, serverTimestamp, query, where, getDocs, collection } from 'firebase/firestore'
 import { getFirebaseAuth, getFirebaseDb } from '@/services/firebase'
-import { getCollection } from '@/services/firestore'
 import type { UserProfile, Role } from '@/types'
 
-/**
- * Сервис авторизации.
- * Регистрация: создаёт пользователя в Firebase Auth + документ в Firestore.
- * Первый зарегистрированный пользователь получает роль superadmin.
- */
+const PLACEHOLDER_DOMAIN = '@cosplay.app'
 
-/** Полный профиль пользователя (Auth + Firestore) */
 export interface AuthProfile {
   user: User
   profile: UserProfile
 }
 
-/** Создаёт профиль в Firestore после регистрации */
+/** Проверяет уникальность имени пользователя */
+async function isUsernameTaken(username: string): Promise<boolean> {
+  const db = getFirebaseDb()
+  const q = query(collection(db, 'users'), where('displayName', '==', username))
+  const snap = await getDocs(q)
+  return !snap.empty
+}
+
+/** Генерирует email-заглушку из username */
+function makePlaceholderEmail(username: string): string {
+  return `${username.toLowerCase().replace(/[^a-z0-9]/g, '_')}${PLACEHOLDER_DOMAIN}`
+}
+
+/** Создаёт профиль в Firestore */
 async function createUserProfile(
   uid: string,
-  email: string,
+  authEmail: string,
   displayName: string,
+  realEmail?: string,
 ): Promise<UserProfile> {
   const db = getFirebaseDb()
-
-  // Проверяем, есть ли уже пользователи в системе
-  const existingUsers = await getCollection<UserProfile>('users')
-  const role: Role = existingUsers.length === 0 ? 'superadmin' : 'user'
+  const existingUsers = await getDocs(collection(db, 'users'))
+  const role: Role = existingUsers.empty ? 'superadmin' : 'user'
 
   const profile: UserProfile = {
     id: uid,
-    email,
     displayName,
     role,
     createdAt: Date.now(),
   }
 
-  // Сохраняем профиль в Firestore
+  // Если пользователь ввёл реальный email — сохраняем
+  if (realEmail) {
+    profile.email = realEmail
+  }
+
+  // Если authEmail — заглушка, не сохраняем её в профиль
+  // Если authEmail — реальный email (не заглушка), сохраняем
+  if (!realEmail && authEmail.endsWith(PLACEHOLDER_DOMAIN)) {
+    // не сохраняем заглушку
+  } else if (!realEmail) {
+    profile.email = authEmail
+  }
+
   await setDoc(doc(db, 'users', uid), {
     ...profile,
     createdAt: serverTimestamp(),
@@ -52,37 +69,67 @@ async function createUserProfile(
   return profile
 }
 
-/** Регистрация нового пользователя */
+/** Регистрация */
 export async function registerUser(
-  email: string,
-  password: string,
   displayName: string,
+  password: string,
+  email?: string,
 ): Promise<AuthProfile> {
   const auth = getFirebaseAuth()
-  const credential = await createUserWithEmailAndPassword(auth, email, password)
+
+  // Проверяем уникальность username
+  const taken = await isUsernameTaken(displayName)
+  if (taken) {
+    throw new Error('Это имя пользователя уже занято')
+  }
+
+  // Определяем email для Firebase Auth
+  const authEmail = email || makePlaceholderEmail(displayName)
+
+  const credential = await createUserWithEmailAndPassword(auth, authEmail, password)
   const user = credential.user
 
-  // Устанавливаем отображаемое имя
   await updateProfile(user, { displayName })
-
-  // Создаём профиль в Firestore
-  const profile = await createUserProfile(user.uid, email, displayName)
+  const profile = await createUserProfile(user.uid, authEmail, displayName, email)
 
   return { user, profile }
 }
 
-/** Вход в систему */
+/** Поиск email по username в Firestore */
+async function findEmailByUsername(username: string): Promise<string | null> {
+  const db = getFirebaseDb()
+  const q = query(collection(db, 'users'), where('displayName', '==', username))
+  const snap = await getDocs(q)
+
+  if (snap.empty) return null
+
+  // У пользователя в Firestore может не быть поля email (если регился без почты).
+  // В этом случае генерируем такой же placeholder
+  const data = snap.docs[0].data() as UserProfile
+  return data.email || makePlaceholderEmail(username)
+}
+
+/** Вход */
 export async function loginUser(
-  email: string,
+  login: string,
   password: string,
 ): Promise<AuthProfile> {
   const auth = getFirebaseAuth()
-  const credential = await signInWithEmailAndPassword(auth, email, password)
+  let authEmail = login
+
+  // Если ввели не email — ищем username в Firestore
+  if (!login.includes('@')) {
+    const found = await findEmailByUsername(login)
+    if (!found) {
+      throw new Error('Пользователь с таким именем не найден')
+    }
+    authEmail = found
+  }
+
+  const credential = await signInWithEmailAndPassword(auth, authEmail, password)
   const user = credential.user
 
-  // Загружаем профиль из Firestore
   const profile = await getUserProfile(user.uid)
-
   if (!profile) {
     throw new Error('Профиль пользователя не найден в базе данных')
   }
@@ -102,13 +149,11 @@ export async function resetPassword(email: string): Promise<void> {
   await sendPasswordResetEmail(auth, email)
 }
 
-/** Загружает профиль пользователя из Firestore */
+/** Загружает профиль из Firestore */
 export async function getUserProfile(uid: string): Promise<UserProfile | null> {
   const db = getFirebaseDb()
   const docRef = doc(db, 'users', uid)
   const docSnap = await getDoc(docRef)
-
   if (!docSnap.exists()) return null
-
   return { id: docSnap.id, ...docSnap.data() } as UserProfile
 }
