@@ -15,6 +15,7 @@ import { CirclePage } from '@/features/social/pages/CirclePage'
 import { CircleSettingsPage } from '@/features/social/pages/CircleSettingsPage'
 import { CircleJoinPage } from '@/features/social/pages/CircleJoinPage'
 import { NotFound } from '@/pages/NotFound'
+import { ErrorBoundary } from '@/components/ui/ErrorBoundary'
 
 function RedirectHandler() {
   const navigate = useNavigate()
@@ -34,6 +35,7 @@ export function App() {
     <BrowserRouter basename="/Cosplay_is_fun">
       <RedirectHandler />
       <AuthProvider>
+        <ErrorBoundary>
         <Routes>
           <Route element={<Layout />}>
             <Route path="/" element={<Home />} />
@@ -57,6 +59,7 @@ export function App() {
             <Route path="*" element={<NotFound />} />
           </Route>
         </Routes>
+        </ErrorBoundary>
       </AuthProvider>
     </BrowserRouter>
   )

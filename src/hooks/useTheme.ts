@@ -10,14 +10,18 @@ const STORAGE_KEY = 'cosplay-theme'
  */
 export function useTheme() {
   const [theme, setThemeState] = useState<Theme>(() => {
-    const saved = localStorage.getItem(STORAGE_KEY) as Theme | null
-    return saved ?? 'light'
+    try {
+      const saved = localStorage.getItem(STORAGE_KEY) as Theme | null
+      return saved ?? 'light'
+    } catch {
+      return 'light'
+    }
   })
 
   // Применяем тему к DOM при каждом изменении
   useEffect(() => {
     document.documentElement.setAttribute('data-theme', theme)
-    localStorage.setItem(STORAGE_KEY, theme)
+    try { localStorage.setItem(STORAGE_KEY, theme) } catch {}
   }, [theme])
 
   const toggleTheme = useCallback(() => {

@@ -51,8 +51,8 @@ export function ProfilePage() {
     getUserFriendships(targetId).then((fs) => {
       const accepted = fs.filter((f) => f.status === 'accepted')
       setProfileFriends(accepted)
-    })
-    getUserCircles(targetId).then(setProfileCircles)
+    }).catch(() => {})
+    getUserCircles(targetId).then(setProfileCircles).catch(() => {})
   }, [p?.id])
 
   useEffect(() => {
@@ -66,6 +66,8 @@ export function ProfilePage() {
           const common = await haveCommonCircle(user.uid, profile.id)
           setHasCommonCircle(common)
         }
+      }).catch(() => {
+        setOtherProfile(null)
       }).finally(() => setOtherLoading(false))
     } else {
       setOtherProfile(null)
@@ -210,7 +212,8 @@ export function ProfilePage() {
                 {profileFriends.length > 0 && (
                   <div className={styles.friendsRow}>
                     {profileFriends.slice(0, 6).map((f) => {
-                      const fid = getFriendId(f, p!.id)
+                      if (!p) return null
+                      const fid = getFriendId(f, p.id)
                       return <UserPreview key={fid} uid={fid} size={36} />
                     })}
                   </div>

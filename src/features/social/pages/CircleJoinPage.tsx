@@ -19,7 +19,7 @@ export function CircleJoinPage() {
     getCircleByInviteCode(code).then((c) => {
       setCircle(c)
       setLoading(false)
-    })
+    }).catch(() => setLoading(false))
   }, [code])
 
   async function handleJoin() {

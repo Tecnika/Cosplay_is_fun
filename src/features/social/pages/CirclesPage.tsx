@@ -17,7 +17,7 @@ export function CirclesPage() {
   const [pubLoading, setPubLoading] = useState(true)
 
   useEffect(() => {
-    getPublicCircles().then((c) => { setPublicCircles(c); setPubLoading(false) })
+    getPublicCircles().then((c) => { setPublicCircles(c); setPubLoading(false) }).catch(() => setPubLoading(false))
   }, [])
 
   const myIds = new Set(myCircles.map((c) => c.id))

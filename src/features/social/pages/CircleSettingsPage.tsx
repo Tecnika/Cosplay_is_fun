@@ -30,7 +30,7 @@ export function CircleSettingsPage() {
   useEffect(() => {
     if (!id) return
     getCircle(id).then((c) => {
-      if (!c) return
+      if (!c) { setLoading(false); return }
       setCircle(c)
       setName(c.name)
       setDescription(c.description || '')
@@ -39,7 +39,7 @@ export function CircleSettingsPage() {
       setCoverURL(c.coverURL || '')
       setIsPrivate(c.isPrivate)
       setLoading(false)
-    })
+    }).catch(() => setLoading(false))
   }, [id])
 
   async function handleSave(e: FormEvent) {
