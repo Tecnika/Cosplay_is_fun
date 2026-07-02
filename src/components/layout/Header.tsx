@@ -6,9 +6,10 @@ interface HeaderProps {
   theme: Theme
   onToggleTheme: () => void
   isAuthenticated: boolean
+  onLogout?: () => void
 }
 
-export function Header({ theme, onToggleTheme, isAuthenticated }: HeaderProps) {
+export function Header({ theme, onToggleTheme, isAuthenticated, onLogout }: HeaderProps) {
   return (
     <header className={styles.header}>
       <div className={styles.inner}>
@@ -32,7 +33,10 @@ export function Header({ theme, onToggleTheme, isAuthenticated }: HeaderProps) {
           </button>
 
           {isAuthenticated ? (
-            <Link to="/profile" className={styles.profileBtn}>Профиль</Link>
+            <>
+              <Link to="/profile" className={styles.profileBtn}>Профиль</Link>
+              <button onClick={onLogout} className={styles.logoutBtn}>Выйти</button>
+            </>
           ) : (
             <Link to="/auth" className={styles.authBtn}>Войти</Link>
           )}

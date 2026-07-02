@@ -7,7 +7,7 @@ import styles from './Layout.module.css'
 
 export function Layout() {
   const { theme, toggleTheme } = useTheme()
-  const { isAuthenticated } = useAuth()
+  const { isAuthenticated, logout } = useAuth()
 
   return (
     <>
@@ -15,6 +15,7 @@ export function Layout() {
         theme={theme}
         onToggleTheme={toggleTheme}
         isAuthenticated={isAuthenticated}
+        onLogout={logout}
       />
       <main className={styles.main}>
         <Outlet />
