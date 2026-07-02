@@ -4,6 +4,12 @@ import { App } from './App'
 import { initFirebase } from './services/firebase'
 import './index.css'
 
+// Глобальный перехват unhandled rejections (Firebase onboarding.js и др.)
+window.addEventListener('unhandledrejection', (e) => {
+  e.preventDefault()
+  console.warn('[unhandledrejection]', e.reason)
+})
+
 try {
   localStorage.setItem('firebase:devmode', 'false')
 } catch {}
