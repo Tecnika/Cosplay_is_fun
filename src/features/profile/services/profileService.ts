@@ -1,4 +1,4 @@
-import { doc, getDoc, updateDoc, serverTimestamp, query, where, getDocs, collection } from 'firebase/firestore'
+import { doc, getDoc, updateDoc, serverTimestamp, query, where, orderBy, limit, getDocs, collection } from 'firebase/firestore'
 import { getFirebaseDb } from '@/services/firebase'
 import type { UserProfile, PrivacyLevel } from '@/types'
 
@@ -19,6 +19,21 @@ export async function getProfileByUsername(username: string): Promise<UserProfil
   return { id: snap.docs[0].id, ...snap.docs[0].data() } as UserProfile
 }
 
+/** Ищет пользователей по префиксу displayName */
+export async function searchUsers(q: string, max = 20): Promise<UserProfile[]> {
+  const db = getFirebaseDb()
+  if (q.length < 1) return []
+  const lower = q.toLowerCase()
+  const snap = await getDocs(query(
+    collection(db, 'users'),
+    orderBy('displayName'),
+    where('displayName', '>=', lower),
+    where('displayName', '<', lower + '~'),
+    limit(max),
+  ))
+  return snap.docs.map((d) => ({ id: d.id, ...d.data() }) as UserProfile)
+}
+
 /** Обновляет профиль */
 export async function updateProfile(uid: string, data: Partial<UserProfile>): Promise<void> {
   const db = getFirebaseDb()
@@ -32,10 +47,13 @@ export async function updateProfile(uid: string, data: Partial<UserProfile>): Pr
 export function isFieldVisible(
   privacy: PrivacyLevel | undefined,
   viewerRole: 'self' | 'superadmin' | 'other',
+  isFriend?: boolean,
 ): boolean {
   if (viewerRole === 'self') return true
   if (viewerRole === 'superadmin') return true
-  // Для других пользователей показываем только public
-  // TODO: добавить проверку друзей/кругов
-  return privacy === 'public' || !privacy
+
+  if (privacy === 'public' || !privacy) return true
+  if (privacy === 'friends' && isFriend) return true
+  // privacy = friends/ circle/ private — не показываем
+  return false
 }

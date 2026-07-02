@@ -28,6 +28,11 @@
   gap: var(--spacing-lg);
 }
 
+.friendBtnWrap {
+  display: flex;
+  justify-content: flex-end;
+}
+
 /* Аватар */
 .avatarSection {
   position: relative;
@@ -115,6 +120,61 @@
   padding: var(--spacing-md);
   background-color: var(--color-bg-secondary);
   border-radius: var(--radius-lg);
+}
+
+.socialContent {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+}
+
+.friendsRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-xs);
+}
+
+.circlesRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-sm);
+}
+
+.circleMini {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  text-decoration: none;
+  color: inherit;
+  padding: 4px var(--spacing-sm);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-full);
+  font-size: var(--font-size-xs);
+  transition: border-color var(--transition-fast);
+}
+
+.circleMini:hover {
+  border-color: var(--color-accent);
+  color: var(--color-accent);
+}
+
+.circleMiniAvatar {
+  width: 20px;
+  height: 20px;
+  border-radius: var(--radius-full);
+  background: var(--gradient-primary);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.6rem;
+  font-weight: 700;
+  background-size: cover;
+  flex-shrink: 0;
+}
+
+.circleMiniName {
+  font-weight: 500;
 }
 
 .projectsSection {

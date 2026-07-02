@@ -21,8 +21,14 @@ export function Header({ theme, onToggleTheme, isAuthenticated, userName, userAv
         </Link>
 
         <nav className={styles.nav}>
+          {isAuthenticated && (
+            <>
+              <Link to="/social/users" className={styles.link}>Участники</Link>
+              <Link to="/social/friends" className={styles.link}>Друзья</Link>
+              <Link to="/social/circles" className={styles.link}>Круги</Link>
+            </>
+          )}
           <Link to="/planner" className={styles.link}>Планировщик</Link>
-          <Link to="/social" className={styles.link}>Лента</Link>
           <Link to="/gallery" className={styles.link}>Галерея</Link>
         </nav>
 

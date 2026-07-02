@@ -1,0 +1,16 @@
+.link {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  text-decoration: none;
+  color: inherit;
+}
+
+.link:hover {
+  color: var(--color-accent);
+}
+
+.name {
+  font-weight: 600;
+  font-size: var(--font-size-md);
+}

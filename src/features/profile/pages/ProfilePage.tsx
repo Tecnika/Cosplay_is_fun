@@ -1,11 +1,16 @@
 import { useState, useEffect } from 'react'
-import { useParams } from 'react-router-dom'
+import { useParams, Link } from 'react-router-dom'
 import { useAuth } from '@/features/auth/hooks/useAuth'
 import { Avatar } from '../components/Avatar'
 import { PrivacyBadge } from '../components/PrivacyBadge'
 import { useProfile } from '../hooks/useProfile'
 import { getProfileByUsername, updateProfile, isFieldVisible } from '../services/profileService'
-import type { PrivacyLevel, UserProfile } from '@/types'
+import { FriendButton } from '@/features/social/components/FriendButton'
+import { UserPreview } from '@/features/social/components/UserPreview'
+import { getFriendship, getUserFriendships, getFriendId, getFriendRelation } from '@/features/social/services/friendsService'
+import { getUserCircles } from '@/features/social/services/circlesService'
+import type { PrivacyLevel, UserProfile, Friendship } from '@/types'
+import type { Circle } from '@/features/social/types'
 import { PRIVACY_LABELS } from '../types'
 import styles from './ProfilePage.module.css'
 
@@ -22,6 +27,10 @@ export function ProfilePage() {
   const [otherProfile, setOtherProfile] = useState<UserProfile | null>(null)
   const [otherLoading, setOtherLoading] = useState(false)
 
+  const [isFriend, setIsFriend] = useState(false)
+  const [profileFriends, setProfileFriends] = useState<Friendship[]>([])
+  const [profileCircles, setProfileCircles] = useState<Circle[]>([])
+
   const p = otherProfile || loadedProfile || myProfile
   const currentName = p?.displayName || user?.displayName || 'Пользователь'
 
@@ -35,13 +44,28 @@ export function ProfilePage() {
   useEffect(() => {
     if (username) {
       setOtherLoading(true)
-      getProfileByUsername(username)
-        .then(setOtherProfile)
-        .finally(() => setOtherLoading(false))
+      getProfileByUsername(username).then(async (profile) => {
+        setOtherProfile(profile)
+        if (profile) {
+          // Загружаем друзей и круги владельца профиля
+          getUserFriendships(profile.id).then((fs) => {
+            const accepted = fs.filter((f) => f.status === 'accepted')
+            setProfileFriends(accepted)
+          })
+          getUserCircles(profile.id).then(setProfileCircles)
+        }
+        if (user && profile && user.uid !== profile.id) {
+          const f = await getFriendship(user.uid, profile.id)
+          setIsFriend(f?.status === 'accepted')
+        }
+      }).finally(() => setOtherLoading(false))
     } else {
       setOtherProfile(null)
+      setIsFriend(false)
+      setProfileFriends([])
+      setProfileCircles([])
     }
-  }, [username])
+  }, [username, user])
 
   // Редактирование
   const [editing, setEditing] = useState(false)
@@ -161,12 +185,53 @@ export function ProfilePage() {
 
         {/* Правая колонка */}
         <div className={styles.rightCol}>
+          {viewMode === 'other' && otherProfile && (
+            <div className={styles.friendBtnWrap}>
+              <FriendButton targetUid={otherProfile.id} />
+            </div>
+          )}
+
           {renderBio()}
 
-          <div className={styles.socialSection}>
-            <h3 className={styles.sectionTitle}>Друзья и круги</h3>
-            <p className={styles.placeholder}>Здесь будут друзья и круги общения</p>
-          </div>
+            <div className={styles.socialSection}>
+              <h3 className={styles.sectionTitle}>
+                <Link to="/social/friends" style={{ color: 'inherit', textDecoration: 'none' }}>Друзья</Link>
+                {' · '}
+                <Link to="/social/circles" style={{ color: 'inherit', textDecoration: 'none' }}>Круги</Link>
+              </h3>
+              <div className={styles.socialContent}>
+                {profileFriends.length > 0 && (
+                  <div className={styles.friendsRow}>
+                    {profileFriends.slice(0, 6).map((f) => {
+                      const fid = getFriendId(f, p!.id)
+                      return <UserPreview key={fid} uid={fid} size={36} />
+                    })}
+                  </div>
+                )}
+                {profileFriends.length === 0 && (
+                  <p className={styles.placeholder}>Нет друзей</p>
+                )}
+
+                {profileCircles.length > 0 && (
+                  <div className={styles.circlesRow}>
+                    {profileCircles.slice(0, 3).map((c) => (
+                      <Link key={c.id} to={`/social/circles/${c.id}`} className={styles.circleMini}>
+                        <div
+                          className={styles.circleMiniAvatar}
+                          style={c.avatarURL ? { backgroundImage: `url(${c.avatarURL})` } : undefined}
+                        >
+                          {!c.avatarURL && c.name.charAt(0).toUpperCase()}
+                        </div>
+                        <span className={styles.circleMiniName}>{c.name}</span>
+                      </Link>
+                    ))}
+                  </div>
+                )}
+                {profileCircles.length === 0 && (
+                  <p className={styles.placeholder}>Нет кругов</p>
+                )}
+              </div>
+            </div>
 
           <div className={styles.projectsSection}>
             <h3 className={styles.sectionTitle}>Проекты</h3>
@@ -184,7 +249,7 @@ export function ProfilePage() {
   // ---------- Вспомогательные функции ----------
   function renderField(label: string, value: string | null, privacy?: PrivacyLevel) {
     if (!value) return null
-    if (!isFieldVisible(privacy, viewMode)) {
+    if (!isFieldVisible(privacy, viewMode, isFriend)) {
       return (
         <div className={styles.infoRow}>
           <span className={styles.infoLabel}>{label}</span>
@@ -208,7 +273,7 @@ export function ProfilePage() {
   }
 
   function renderBio() {
-    if (p?.bio && isFieldVisible(p.bioPrivacy, viewMode)) {
+    if (p?.bio && isFieldVisible(p.bioPrivacy, viewMode, isFriend)) {
       return (
         <div className={styles.bioSection}>
           <h3 className={styles.sectionTitle}>О себе</h3>
@@ -221,7 +286,7 @@ export function ProfilePage() {
         </div>
       )
     }
-    if (p?.bio && !isFieldVisible(p.bioPrivacy, viewMode)) {
+    if (p?.bio && !isFieldVisible(p.bioPrivacy, viewMode, isFriend)) {
       return (
         <div className={styles.bioSection}>
           <h3 className={styles.sectionTitle}>О себе</h3>

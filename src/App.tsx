@@ -6,9 +6,15 @@ import { Home } from '@/pages/Home'
 import { LoginPage } from '@/features/auth/pages/LoginPage'
 import { RegisterPage } from '@/features/auth/pages/RegisterPage'
 import { ProfilePage } from '@/features/profile/pages/ProfilePage'
+import { FriendsPage } from '@/features/social/pages/FriendsPage'
+import { FindUsersPage } from '@/features/social/pages/FindUsersPage'
+import { UsersPage } from '@/features/social/pages/UsersPage'
+import { CirclesPage } from '@/features/social/pages/CirclesPage'
+import { CircleNewPage } from '@/features/social/pages/CircleNewPage'
+import { CirclePage } from '@/features/social/pages/CirclePage'
+import { CircleSettingsPage } from '@/features/social/pages/CircleSettingsPage'
 import { NotFound } from '@/pages/NotFound'
 
-/** Восстанавливает маршрут после 404.html редиректа GitHub Pages */
 function RedirectHandler() {
   const navigate = useNavigate()
   useEffect(() => {
@@ -34,7 +40,14 @@ export function App() {
             <Route path="/auth/register" element={<RegisterPage />} />
 
             <Route path="/planner" element={<div>Планировщик (в разработке)</div>} />
-            <Route path="/social" element={<div>Лента (в разработке)</div>} />
+            <Route path="/social/users" element={<UsersPage />} />
+            <Route path="/social" element={<FriendsPage />} />
+            <Route path="/social/friends" element={<FriendsPage />} />
+            <Route path="/social/friends/find" element={<FindUsersPage />} />
+            <Route path="/social/circles" element={<CirclesPage />} />
+            <Route path="/social/circles/new" element={<CircleNewPage />} />
+            <Route path="/social/circles/:id" element={<CirclePage />} />
+            <Route path="/social/circles/:id/settings" element={<CircleSettingsPage />} />
             <Route path="/gallery" element={<div>Галерея (в разработке)</div>} />
             <Route path="/profile" element={<ProfilePage />} />
             <Route path="/profile/:username" element={<ProfilePage />} />
