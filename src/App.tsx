@@ -1,4 +1,5 @@
-import { BrowserRouter, Routes, Route } from 'react-router-dom'
+import { useEffect } from 'react'
+import { BrowserRouter, Routes, Route, useNavigate } from 'react-router-dom'
 import { AuthProvider } from '@/features/auth/context/AuthContext'
 import { Layout } from '@/components/layout/Layout'
 import { Home } from '@/pages/Home'
@@ -6,9 +7,24 @@ import { LoginPage } from '@/features/auth/pages/LoginPage'
 import { RegisterPage } from '@/features/auth/pages/RegisterPage'
 import { NotFound } from '@/pages/NotFound'
 
+/** Восстанавливает маршрут после 404.html редиректа GitHub Pages */
+function RedirectHandler() {
+  const navigate = useNavigate()
+  useEffect(() => {
+    const redirect = sessionStorage.getItem('redirect')
+    if (redirect) {
+      sessionStorage.removeItem('redirect')
+      const path = redirect.replace('/Cosplay_is_fun', '') || '/'
+      navigate(path, { replace: true })
+    }
+  }, [navigate])
+  return null
+}
+
 export function App() {
   return (
     <BrowserRouter basename="/Cosplay_is_fun">
+      <RedirectHandler />
       <AuthProvider>
         <Routes>
           <Route element={<Layout />}>
@@ -16,7 +32,6 @@ export function App() {
             <Route path="/auth" element={<LoginPage />} />
             <Route path="/auth/register" element={<RegisterPage />} />
 
-            {/* Плейсхолдеры для модулей — будут реализованы в своих ветках */}
             <Route path="/planner" element={<div>Планировщик (в разработке)</div>} />
             <Route path="/social" element={<div>Лента (в разработке)</div>} />
             <Route path="/gallery" element={<div>Галерея (в разработке)</div>} />

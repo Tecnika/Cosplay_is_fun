@@ -1,20 +1,14 @@
-# GitHub Actions: авто-деплой на GitHub Pages
-# Запускается при пуше в ветку main
 name: Deploy to GitHub Pages
 
 on:
   push:
     branches: [main]
-
-  # Разрешает ручной запуск из Actions вкладки
   workflow_dispatch:
 
-# Запрещаем параллельные деплои
 concurrency:
   group: pages
   cancel-in-progress: false
 
-# Права для деплоя на Pages
 permissions:
   contents: read
   pages: write
@@ -29,19 +23,19 @@ jobs:
       url: ${{ steps.deployment.outputs.page_url }}
 
     steps:
-      - name: Checkout репозитория
+      - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Установка Node.js
+      - name: Setup Node
         uses: actions/setup-node@v4
         with:
           node-version: 20
           cache: npm
 
-      - name: Установка зависимостей
+      - name: Install deps
         run: npm ci
 
-      - name: Сборка проекта
+      - name: Build
         run: npm run build
         env:
           VITE_FIREBASE_API_KEY: ${{ secrets.VITE_FIREBASE_API_KEY }}
@@ -50,4 +44,15 @@ jobs:
           VITE_FIREBASE_STORAGE_BUCKET: ${{ secrets.VITE_FIREBASE_STORAGE_BUCKET }}
           VITE_FIREBASE_MESSAGING_SENDER_ID: ${{ secrets.VITE_FIREBASE_MESSAGING_SENDER_ID }}
           VITE_FIREBASE_APP_ID: ${{ secrets.VITE_FIREBASE_APP_ID }}
-          VITE_FIREBASE_MEASUREMENT_ID: ${{ secrets.VITE_FIREBASE_MEASUREMENT_ID }}
+
+      - name: Configure Pages
+        uses: actions/configure-pages@v4
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: ./dist
+
+      - name: Deploy
+        id: deployment
+        uses: actions/deploy-pages@v4
