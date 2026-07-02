@@ -43,19 +43,23 @@ export function ProfilePage() {
       ? 'superadmin'
       : 'other'
 
+  // Загружаем друзей и круги владельца профиля
+  useEffect(() => {
+    const targetId = p?.id
+    if (!targetId) return
+
+    getUserFriendships(targetId).then((fs) => {
+      const accepted = fs.filter((f) => f.status === 'accepted')
+      setProfileFriends(accepted)
+    })
+    getUserCircles(targetId).then(setProfileCircles)
+  }, [p?.id])
+
   useEffect(() => {
     if (username) {
       setOtherLoading(true)
       getProfileByUsername(username).then(async (profile) => {
         setOtherProfile(profile)
-        if (profile) {
-          // Загружаем друзей и круги владельца профиля
-          getUserFriendships(profile.id).then((fs) => {
-            const accepted = fs.filter((f) => f.status === 'accepted')
-            setProfileFriends(accepted)
-          })
-          getUserCircles(profile.id).then(setProfileCircles)
-        }
         if (user && profile && user.uid !== profile.id) {
           const f = await getFriendship(user.uid, profile.id)
           setIsFriend(f?.status === 'accepted')
@@ -67,8 +71,6 @@ export function ProfilePage() {
       setOtherProfile(null)
       setIsFriend(false)
       setHasCommonCircle(false)
-      setProfileFriends([])
-      setProfileCircles([])
     }
   }, [username, user])
 

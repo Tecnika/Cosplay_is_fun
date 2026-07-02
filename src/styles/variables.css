@@ -70,13 +70,7 @@
   --color-border: #d2d2d7;
   --color-border-light: #e5e5ea;
 
-  /* Анимации */
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(8px); }
-  to   { opacity: 1; transform: translateY(0); }
-}
-
-/* Градиенты для косплей-тематики */
+  /* Градиенты для косплей-тематики */
   --gradient-primary: linear-gradient(135deg, #6c5ce7, #a29bfe);
   --gradient-accent: linear-gradient(135deg, #fd79a8, #e84393);
 }
