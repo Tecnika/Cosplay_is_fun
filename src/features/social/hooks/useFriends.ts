@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import type { Friendship, FriendRelation } from '../types'
-import { getUserFriendships, getFriendId, getFriendRelation } from '../services/friendsService'
+import { getUserFriendships, getFriendId } from '../services/friendsService'
 
 interface FriendWithRelation {
   friendship: Friendship

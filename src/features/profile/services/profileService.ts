@@ -1,6 +1,5 @@
 import { doc, getDoc, updateDoc, serverTimestamp, query, where, orderBy, limit, getDocs, collection } from 'firebase/firestore'
 import { getFirebaseDb } from '@/services/firebase'
-import { haveCommonCircle } from '@/features/social/services/circlesService'
 import type { UserProfile, PrivacyLevel } from '@/types'
 
 /** Загружает профиль по ID */

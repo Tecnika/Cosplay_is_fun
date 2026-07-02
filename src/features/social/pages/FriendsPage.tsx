@@ -18,11 +18,13 @@ export function FriendsPage() {
   if (!user) return <PageShell requiredAuth isAuthenticated={false} />
 
   async function handleAccept(friendId: string) {
+    if (!user) return
     await acceptFriendRequest(user.uid, friendId)
     window.location.reload()
   }
 
   async function handleRemove(friendId: string) {
+    if (!user) return
     await removeFriendship(user.uid, friendId)
     window.location.reload()
   }

@@ -17,8 +17,6 @@ export function CirclePage() {
   const [members, setMembers] = useState<CircleMember[]>([])
   const [myRole, setMyRole] = useState<CircleRole | null>(null)
   const [loading, setLoading] = useState(true)
-  const [inviteLink, setInviteLink] = useState('')
-
   useAsyncEffect(async () => {
     if (!id) return
     const [c, m] = await Promise.all([getCircle(id), getCircleMembers(id)])
@@ -59,7 +57,6 @@ export function CirclePage() {
     try {
       const code = await createInvite(id, user.uid)
       const link = `${window.location.origin}/Cosplay_is_fun/social/circles/join/${code}`
-      setInviteLink(link)
       await navigator.clipboard.writeText(link)
       alert('Ссылка-приглашение скопирована!')
     } catch {

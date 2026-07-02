@@ -33,7 +33,7 @@ export function CirclesPage() {
           <h3 className={styles.sectionTitle}>Мои круги</h3>
           <div className={styles.circleGrid}>
             {myCircles.map((circle) => (
-              <CircleCard key={circle.id} circle={circle} isMember />
+              <CircleCard key={circle.id} circle={circle} />
             ))}
           </div>
         </section>
@@ -53,7 +53,7 @@ export function CirclesPage() {
   )
 }
 
-function CircleCard({ circle, isMember }: { circle: Circle; isMember?: boolean }) {
+function CircleCard({ circle }: { circle: Circle }) {
   return (
     <Link to={`/social/circles/${circle.id}`} className={styles.circleCard}>
       <CircleAvatar name={circle.name} url={circle.avatarURL} size="card" />

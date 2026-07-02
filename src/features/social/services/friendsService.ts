@@ -1,6 +1,6 @@
 import { doc, getDoc, getDocs, setDoc, updateDoc, deleteDoc, serverTimestamp, query, where, collection } from 'firebase/firestore'
 import { getFirebaseDb } from '@/services/firebase'
-import type { Friendship, FriendshipStatus } from '../types'
+import type { Friendship } from '../types'
 
 /** Создаёт ID документа для пары пользователей (сортировка) */
 function friendshipId(uid1: string, uid2: string): string {

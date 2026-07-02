@@ -1,7 +1,7 @@
 import { doc, getDoc, getDocs, setDoc, addDoc, updateDoc, deleteDoc, query, where, serverTimestamp, collection } from 'firebase/firestore'
 import { getFirebaseDb } from '@/services/firebase'
 import { getProfileById } from '@/features/profile/services/profileService'
-import type { Circle, CircleMember, CircleRole, CircleInvite } from '../types'
+import type { Circle, CircleMember, CircleRole } from '../types'
 
 function genCode(): string {
   return Math.random().toString(36).slice(2, 10)
