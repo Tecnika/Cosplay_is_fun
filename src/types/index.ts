@@ -4,24 +4,41 @@
  * Профиль пользователя.
  * Хранится в коллекции Firestore `users`.
  */
+/** Уровень приватности поля */
+export type PrivacyLevel = 'public' | 'friends' | 'circle' | 'private'
+
+/** Поле с уровнем приватности */
+export interface PrivacyField<T> {
+  value: T
+  privacy: PrivacyLevel
+}
+
 export interface UserProfile {
   id: string
   email?: string
   displayName: string
   role: Role
   photoURL?: string
+
+  // Личные данные
+  firstName?: string
+  lastName?: string
+  birthDate?: string
   bio?: string
-  // Доп. данные косплеера
-  cosplayName?: string
-  experience?: string   // 'beginner' | 'intermediate' | 'advanced' | 'pro'
-  socialLinks?: {
-    instagram?: string
-    vk?: string
-    telegram?: string
-  }
-  createdAt: number      // timestamp
+
+  // Приватность полей
+  firstNamePrivacy?: PrivacyLevel
+  lastNamePrivacy?: PrivacyLevel
+  birthDatePrivacy?: PrivacyLevel
+  bioPrivacy?: PrivacyLevel
+  photoPrivacy?: PrivacyLevel
+
+  createdAt: number
   updatedAt?: number
 }
+
+/** Значения по умолчанию для приватности полей */
+export const DEFAULT_PRIVACY: PrivacyLevel = 'public'
 
 /**
  * Косплей-проект (планировщик).

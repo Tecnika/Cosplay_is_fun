@@ -5,6 +5,7 @@ import { Layout } from '@/components/layout/Layout'
 import { Home } from '@/pages/Home'
 import { LoginPage } from '@/features/auth/pages/LoginPage'
 import { RegisterPage } from '@/features/auth/pages/RegisterPage'
+import { ProfilePage } from '@/features/profile/pages/ProfilePage'
 import { NotFound } from '@/pages/NotFound'
 
 /** Восстанавливает маршрут после 404.html редиректа GitHub Pages */
@@ -35,7 +36,7 @@ export function App() {
             <Route path="/planner" element={<div>Планировщик (в разработке)</div>} />
             <Route path="/social" element={<div>Лента (в разработке)</div>} />
             <Route path="/gallery" element={<div>Галерея (в разработке)</div>} />
-            <Route path="/profile" element={<div>Профиль (в разработке)</div>} />
+            <Route path="/profile" element={<ProfilePage />} />
 
             <Route path="*" element={<NotFound />} />
           </Route>
