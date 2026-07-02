@@ -157,14 +157,6 @@ export function ProfilePage() {
           {renderField('Имя', fullName, p?.firstNamePrivacy)}
           {renderField('Дата рождения', formattedDate, p?.birthDatePrivacy)}
 
-          <div className={styles.projectsSection}>
-            <h3 className={styles.sectionTitle}>Проекты</h3>
-            <p className={styles.placeholder}>
-              {viewMode === 'self'
-                ? 'Создайте первый косплей-проект в Планировщике'
-                : 'Нет проектов'}
-            </p>
-          </div>
         </div>
 
         {/* Правая колонка */}
@@ -174,6 +166,15 @@ export function ProfilePage() {
           <div className={styles.socialSection}>
             <h3 className={styles.sectionTitle}>Друзья и круги</h3>
             <p className={styles.placeholder}>Здесь будут друзья и круги общения</p>
+          </div>
+
+          <div className={styles.projectsSection}>
+            <h3 className={styles.sectionTitle}>Проекты</h3>
+            <p className={styles.placeholder}>
+              {viewMode === 'self'
+                ? 'Создайте первый косплей-проект в Планировщике'
+                : 'Нет проектов'}
+            </p>
           </div>
         </div>
       </div>
