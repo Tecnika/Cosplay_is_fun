@@ -37,6 +37,7 @@ export function App() {
             <Route path="/social" element={<div>Лента (в разработке)</div>} />
             <Route path="/gallery" element={<div>Галерея (в разработке)</div>} />
             <Route path="/profile" element={<ProfilePage />} />
+            <Route path="/profile/:username" element={<ProfilePage />} />
 
             <Route path="*" element={<NotFound />} />
           </Route>

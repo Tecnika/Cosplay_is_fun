@@ -1,6 +1,6 @@
-import { doc, getDoc, updateDoc, serverTimestamp } from 'firebase/firestore'
+import { doc, getDoc, updateDoc, serverTimestamp, query, where, getDocs, collection } from 'firebase/firestore'
 import { getFirebaseDb } from '@/services/firebase'
-import type { UserProfile } from '@/types'
+import type { UserProfile, PrivacyLevel } from '@/types'
 
 /** Загружает профиль по ID */
 export async function getProfileById(uid: string): Promise<UserProfile | null> {
@@ -10,6 +10,15 @@ export async function getProfileById(uid: string): Promise<UserProfile | null> {
   return { id: snap.id, ...snap.data() } as UserProfile
 }
 
+/** Ищет профиль по имени пользователя (displayName) */
+export async function getProfileByUsername(username: string): Promise<UserProfile | null> {
+  const db = getFirebaseDb()
+  const q = query(collection(db, 'users'), where('displayName', '==', username))
+  const snap = await getDocs(q)
+  if (snap.empty) return null
+  return { id: snap.docs[0].id, ...snap.docs[0].data() } as UserProfile
+}
+
 /** Обновляет профиль */
 export async function updateProfile(uid: string, data: Partial<UserProfile>): Promise<void> {
   const db = getFirebaseDb()
@@ -17,4 +26,16 @@ export async function updateProfile(uid: string, data: Partial<UserProfile>): Pr
     ...data,
     updatedAt: serverTimestamp(),
   })
+}
+
+/** Проверяет, видно ли поле с данным уровнем приватности */
+export function isFieldVisible(
+  privacy: PrivacyLevel | undefined,
+  viewerRole: 'self' | 'superadmin' | 'other',
+): boolean {
+  if (viewerRole === 'self') return true
+  if (viewerRole === 'superadmin') return true
+  // Для других пользователей показываем только public
+  // TODO: добавить проверку друзей/кругов
+  return privacy === 'public' || !privacy
 }

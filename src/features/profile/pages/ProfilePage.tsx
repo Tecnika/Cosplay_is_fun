@@ -1,31 +1,58 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import { useParams } from 'react-router-dom'
 import { useAuth } from '@/features/auth/hooks/useAuth'
 import { Avatar } from '../components/Avatar'
 import { PrivacyBadge } from '../components/PrivacyBadge'
 import { useProfile } from '../hooks/useProfile'
-import { updateProfile } from '../services/profileService'
-import type { PrivacyLevel } from '@/types'
+import { getProfileByUsername, updateProfile, isFieldVisible } from '../services/profileService'
+import type { PrivacyLevel, UserProfile } from '@/types'
 import { PRIVACY_LABELS } from '../types'
 import styles from './ProfilePage.module.css'
 
 const PRIVACY_OPTIONS: PrivacyLevel[] = ['public', 'friends', 'circle', 'private']
 
+type ViewMode = 'self' | 'superadmin' | 'other'
+
 export function ProfilePage() {
-  const { user, profile: authProfile, refreshProfile } = useAuth()
-  const { profile, loading } = useProfile(user?.uid)
+  const { username } = useParams()
+  const { user, profile: myProfile, refreshProfile } = useAuth()
+  const { profile: loadedProfile, loading } = useProfile(user?.uid)
+
+  // Если открыт чужой профиль — загружаем его
+  const [otherProfile, setOtherProfile] = useState<UserProfile | null>(null)
+  const [otherLoading, setOtherLoading] = useState(false)
+
+  const p = otherProfile || loadedProfile || myProfile
+  const currentName = p?.displayName || user?.displayName || 'Пользователь'
+
+  // Определяем режим просмотра
+  const viewMode: ViewMode = !username
+    ? 'self'
+    : myProfile?.role === 'superadmin'
+      ? 'superadmin'
+      : 'other'
+
+  useEffect(() => {
+    if (username) {
+      setOtherLoading(true)
+      getProfileByUsername(username)
+        .then(setOtherProfile)
+        .finally(() => setOtherLoading(false))
+    } else {
+      setOtherProfile(null)
+    }
+  }, [username])
+
+  // Редактирование
   const [editing, setEditing] = useState(false)
   const [saving, setSaving] = useState(false)
   const [saveError, setSaveError] = useState('')
-
   const [firstName, setFirstName] = useState('')
   const [lastName, setLastName] = useState('')
   const [birthDate, setBirthDate] = useState('')
   const [bio, setBio] = useState('')
   const [photoURL, setPhotoURL] = useState('')
   const [privacies, setPrivacies] = useState<Record<string, PrivacyLevel>>({})
-
-  const currentName = authProfile?.displayName || user?.displayName || 'Пользователь'
-  const p = profile || authProfile
 
   function startEditing() {
     setFirstName(p?.firstName || '')
@@ -72,29 +99,26 @@ export function ProfilePage() {
     }
   }
 
-  function cancelEdit() {
-    setEditing(false)
-  }
+  function cancelEdit() { setEditing(false) }
 
-  if (loading) return <div className={styles.page}>Загрузка...</div>
-  if (!user) return <div className={styles.page}>Авторизуйтесь для просмотра профиля</div>
+  // Состояния загрузки
+  if (loading || otherLoading) return <div className={styles.page}>Загрузка...</div>
+  if (!user && !username) return <div className={styles.page}>Авторизуйтесь для просмотра профиля</div>
+  if (username && !otherProfile) return <div className={styles.page}>Пользователь не найден</div>
 
-  // ---------- Режим редактирования ----------
-  if (editing) {
+  // ---------- Редактирование ----------
+  if (editing && viewMode === 'self') {
     return (
       <div className={styles.page}>
         <div className={styles.card}>
           <h2 className={styles.title}>Редактирование профиля</h2>
-
           <div className={styles.editForm}>
             {editField('Фото (URL)', photoURL, setPhotoURL, 'photo')}
             {editField('Имя', firstName, setFirstName, 'firstName')}
             {editField('Фамилия', lastName, setLastName, 'lastName')}
             {editField('Дата рождения', birthDate, setBirthDate, 'birthDate', 'date')}
             {editTextArea('О себе', bio, setBio, 'bio')}
-
             {saveError && <div className={styles.error}>{saveError}</div>}
-
             <div className={styles.actions}>
               <button className={styles.saveBtn} onClick={handleSave} disabled={saving}>
                 {saving ? 'Сохранение...' : 'Сохранить'}
@@ -107,7 +131,7 @@ export function ProfilePage() {
     )
   }
 
-  // ---------- Просмотр профиля ----------
+  // ---------- Просмотр ----------
   const fullName = [p?.firstName, p?.lastName].filter(Boolean).join(' ')
   const formattedDate = p?.birthDate ? new Date(p.birthDate).toLocaleDateString('ru-RU') : null
 
@@ -117,51 +141,35 @@ export function ProfilePage() {
         {/* Левая колонка */}
         <div className={styles.leftCol}>
           <div className={styles.avatarSection}>
-            <Avatar name={currentName} url={p?.photoURL} size={120} />
-            <button className={styles.editIconBtn} onClick={startEditing} title="Редактировать профиль">✏️</button>
+            <Avatar name={currentName} url={isFieldVisible(p?.photoPrivacy, viewMode) ? p?.photoURL : undefined} size={120} />
+            {viewMode === 'self' && (
+              <button className={styles.editIconBtn} onClick={startEditing} title="Редактировать профиль">✏️</button>
+            )}
+            {viewMode === 'superadmin' && (
+              <span className={styles.superadminBadge}>👁️ superadmin</span>
+            )}
           </div>
 
           <div className={styles.nickRow}>
             <h1 className={styles.nick}>{currentName}</h1>
           </div>
 
-          {fullName && (
-            <div className={styles.infoRow}>
-              <span className={styles.infoLabel}>Имя</span>
-              <span className={styles.infoValue}>
-                {fullName}
-                <PrivacyBadge level={p?.firstNamePrivacy || 'public'} />
-              </span>
-            </div>
-          )}
-
-          {formattedDate && (
-            <div className={styles.infoRow}>
-              <span className={styles.infoLabel}>Дата рождения</span>
-              <span className={styles.infoValue}>
-                {formattedDate}
-                <PrivacyBadge level={p?.birthDatePrivacy || 'public'} />
-              </span>
-            </div>
-          )}
+          {renderField('Имя', fullName, p?.firstNamePrivacy)}
+          {renderField('Дата рождения', formattedDate, p?.birthDatePrivacy)}
 
           <div className={styles.projectsSection}>
             <h3 className={styles.sectionTitle}>Проекты</h3>
-            <p className={styles.placeholder}>Создайте первый косплей-проект в Планировщике</p>
+            <p className={styles.placeholder}>
+              {viewMode === 'self'
+                ? 'Создайте первый косплей-проект в Планировщике'
+                : 'Нет проектов'}
+            </p>
           </div>
         </div>
 
         {/* Правая колонка */}
         <div className={styles.rightCol}>
-          {p?.bio && (
-            <div className={styles.bioSection}>
-              <h3 className={styles.sectionTitle}>О себе</h3>
-              <p className={styles.bio}>
-                {p.bio}
-                <PrivacyBadge level={p?.bioPrivacy || 'public'} />
-              </p>
-            </div>
-          )}
+          {renderBio()}
 
           <div className={styles.socialSection}>
             <h3 className={styles.sectionTitle}>Друзья и круги</h3>
@@ -173,32 +181,66 @@ export function ProfilePage() {
   )
 
   // ---------- Вспомогательные функции ----------
-  function editField(
-    label: string,
-    value: string,
-    onChange: (v: string) => void,
-    privacyKey: string,
-    type: string = 'text',
-  ) {
+  function renderField(label: string, value: string | null, privacy?: PrivacyLevel) {
+    if (!value) return null
+    if (!isFieldVisible(privacy, viewMode)) {
+      return (
+        <div className={styles.infoRow}>
+          <span className={styles.infoLabel}>{label}</span>
+          <span className={styles.privacyHidden}>
+            🔒 {PRIVACY_LABELS[privacy || 'private']}
+          </span>
+        </div>
+      )
+    }
+    return (
+      <div className={styles.infoRow}>
+        <span className={styles.infoLabel}>{label}</span>
+        <span className={styles.infoValue}>
+          {value}
+          {viewMode === 'self' && privacy && privacy !== 'public' && (
+            <PrivacyBadge level={privacy} />
+          )}
+        </span>
+      </div>
+    )
+  }
+
+  function renderBio() {
+    if (p?.bio && isFieldVisible(p.bioPrivacy, viewMode)) {
+      return (
+        <div className={styles.bioSection}>
+          <h3 className={styles.sectionTitle}>О себе</h3>
+          <p className={styles.bio}>
+            {p.bio}
+            {viewMode === 'self' && p.bioPrivacy && p.bioPrivacy !== 'public' && (
+              <PrivacyBadge level={p.bioPrivacy} />
+            )}
+          </p>
+        </div>
+      )
+    }
+    if (p?.bio && !isFieldVisible(p.bioPrivacy, viewMode)) {
+      return (
+        <div className={styles.bioSection}>
+          <h3 className={styles.sectionTitle}>О себе</h3>
+          <p className={styles.privacyHidden}>
+            🔒 {PRIVACY_LABELS[p.bioPrivacy || 'private']}
+          </p>
+        </div>
+      )
+    }
+    return null
+  }
+
+  function editField(label: string, value: string, onChange: (v: string) => void, privacyKey: string, type = 'text') {
     return (
       <label className={styles.editField}>
         <span className={styles.editLabel}>{label}</span>
         <div className={styles.editRow}>
-          <input
-            className={styles.input}
-            type={type}
-            value={value}
-            onChange={(e) => onChange(e.target.value)}
-            placeholder={label}
-          />
-          <select
-            className={styles.privacySelect}
-            value={privacies[privacyKey] || 'public'}
-            onChange={(e) => setPrivacies({ ...privacies, [privacyKey]: e.target.value as PrivacyLevel })}
-          >
-            {PRIVACY_OPTIONS.map((opt) => (
-              <option key={opt} value={opt}>{PRIVACY_LABELS[opt]}</option>
-            ))}
+          <input className={styles.input} type={type} value={value} onChange={(e) => onChange(e.target.value)} placeholder={label} />
+          <select className={styles.privacySelect} value={privacies[privacyKey] || 'public'} onChange={(e) => setPrivacies({ ...privacies, [privacyKey]: e.target.value as PrivacyLevel })}>
+            {PRIVACY_OPTIONS.map((opt) => <option key={opt} value={opt}>{PRIVACY_LABELS[opt]}</option>)}
           </select>
         </div>
       </label>
@@ -210,21 +252,9 @@ export function ProfilePage() {
       <label className={styles.editField}>
         <span className={styles.editLabel}>{label}</span>
         <div className={styles.editRow}>
-          <textarea
-            className={styles.textarea}
-            value={value}
-            onChange={(e) => onChange(e.target.value)}
-            placeholder={label}
-            rows={3}
-          />
-          <select
-            className={styles.privacySelect}
-            value={privacies[privacyKey] || 'public'}
-            onChange={(e) => setPrivacies({ ...privacies, [privacyKey]: e.target.value as PrivacyLevel })}
-          >
-            {PRIVACY_OPTIONS.map((opt) => (
-              <option key={opt} value={opt}>{PRIVACY_LABELS[opt]}</option>
-            ))}
+          <textarea className={styles.textarea} value={value} onChange={(e) => onChange(e.target.value)} placeholder={label} rows={3} />
+          <select className={styles.privacySelect} value={privacies[privacyKey] || 'public'} onChange={(e) => setPrivacies({ ...privacies, [privacyKey]: e.target.value as PrivacyLevel })}>
+            {PRIVACY_OPTIONS.map((opt) => <option key={opt} value={opt}>{PRIVACY_LABELS[opt]}</option>)}
           </select>
         </div>
       </label>

@@ -127,6 +127,23 @@
   font-style: italic;
 }
 
+.superadminBadge {
+  display: inline-block;
+  margin-top: var(--spacing-sm);
+  padding: 2px var(--spacing-sm);
+  background-color: var(--color-accent-light);
+  color: var(--color-accent);
+  border-radius: var(--radius-sm);
+  font-size: var(--font-size-xs);
+  font-weight: 600;
+}
+
+.privacyHidden {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-tertiary);
+  font-style: italic;
+}
+
 /* Карточка редактирования */
 .card {
   max-width: 640px;
