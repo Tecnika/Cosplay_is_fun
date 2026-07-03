@@ -109,6 +109,18 @@ export interface Comment {
 export type Role = 'superadmin' | 'admin' | 'moderator' | 'user'
 
 /**
- * Тема оформления сайта.
+ * Тема оформления сайта (светлая/тёмная).
  */
 export type Theme = 'light' | 'dark'
+
+/** Цветовая схема */
+export type ColorTheme = 'cosplay' | 'ocean' | 'sunset' | 'forest'
+
+/** Стилевой вариант */
+export type StyleVariant = 'rounded' | 'sharp' | 'glass' | 'bold'
+
+/** Настройки дизайна */
+export interface DesignSettings {
+  colorTheme: ColorTheme
+  styleVariant: StyleVariant
+}

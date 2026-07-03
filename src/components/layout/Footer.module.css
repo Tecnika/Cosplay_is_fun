@@ -1,8 +1,8 @@
 .footer {
   margin-top: auto;
-  border-top: 1px solid var(--color-border);
-  background-color: var(--color-bg-secondary);
-  transition: background-color var(--transition-normal);
+  border-top: 1px solid var(--color-divider);
+  background-color: var(--color-surface-strong);
+  transition: background-color var(--transition-normal), border-color var(--transition-normal);
 }
 
 .inner {
@@ -21,5 +21,8 @@
 
 .made {
   font-size: var(--font-size-sm);
-  color: var(--color-text-tertiary);
+  background: var(--gradient-accent);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
 }

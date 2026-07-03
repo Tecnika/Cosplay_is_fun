@@ -4,4 +4,19 @@
   max-width: var(--max-width);
   margin: 0 auto;
   padding: var(--spacing-lg) var(--spacing-md);
+  position: relative;
+}
+
+.main::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 80%;
+  max-width: 400px;
+  height: 3px;
+  background: var(--gradient-primary);
+  border-radius: 0 0 var(--radius-full) var(--radius-full);
+  opacity: 0.5;
 }

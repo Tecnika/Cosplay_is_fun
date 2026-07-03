@@ -6,6 +6,7 @@ import { Home } from '@/pages/Home'
 import { LoginPage } from '@/features/auth/pages/LoginPage'
 import { RegisterPage } from '@/features/auth/pages/RegisterPage'
 import { ProfilePage } from '@/features/profile/pages/ProfilePage'
+import { SettingsPage } from '@/features/profile/pages/SettingsPage'
 import { FriendsPage } from '@/features/social/pages/FriendsPage'
 import { FindUsersPage } from '@/features/social/pages/FindUsersPage'
 import { UsersPage } from '@/features/social/pages/UsersPage'
@@ -54,6 +55,7 @@ export function App() {
             <Route path="/social/circles/:id/settings" element={<CircleSettingsPage />} />
             <Route path="/gallery" element={<div>Галерея (в разработке)</div>} />
             <Route path="/profile" element={<ProfilePage />} />
+            <Route path="/profile/settings" element={<SettingsPage />} />
             <Route path="/profile/:username" element={<ProfilePage />} />
 
             <Route path="*" element={<NotFound />} />

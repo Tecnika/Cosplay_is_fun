@@ -1,0 +1,172 @@
+/* Цветовые схемы — переопределяют переменные из variables.css */
+
+/* Cosplay (по умолчанию) — фиолетовый */
+[data-color-theme='cosplay'] {
+  --color-accent: #6c5ce7;
+  --color-accent-hover: #5a4bd1;
+  --color-accent-light: rgba(108, 92, 231, 0.12);
+  --color-secondary: #fd79a8;
+  --color-secondary-hover: #e84393;
+  --gradient-primary: linear-gradient(135deg, #6c5ce7, #a29bfe);
+  --gradient-accent: linear-gradient(135deg, #fd79a8, #e84393);
+}
+
+/* Ocean — сине-бирюзовая */
+[data-color-theme='ocean'] {
+  --color-accent: #0984e3;
+  --color-accent-hover: #0770c4;
+  --color-accent-light: rgba(9, 132, 227, 0.12);
+  --color-secondary: #00cec9;
+  --color-secondary-hover: #00b5b0;
+  --gradient-primary: linear-gradient(135deg, #0984e3, #74b9ff);
+  --gradient-accent: linear-gradient(135deg, #00cec9, #55efc4);
+}
+
+/* Sunset — тёплая оранжево-розовая */
+[data-color-theme='sunset'] {
+  --color-accent: #e17055;
+  --color-accent-hover: #d63031;
+  --color-accent-light: rgba(225, 112, 85, 0.12);
+  --color-secondary: #fdcb6e;
+  --color-secondary-hover: #f9a825;
+  --gradient-primary: linear-gradient(135deg, #e17055, #fab1a0);
+  --gradient-accent: linear-gradient(135deg, #fdcb6e, #f9a825);
+}
+
+/* Forest — зелёная */
+[data-color-theme='forest'] {
+  --color-accent: #00b894;
+  --color-accent-hover: #00a381;
+  --color-accent-light: rgba(0, 184, 148, 0.12);
+  --color-secondary: #55efc4;
+  --color-secondary-hover: #00cec9;
+  --gradient-primary: linear-gradient(135deg, #00b894, #55efc4);
+  --gradient-accent: linear-gradient(135deg, #a29bfe, #6c5ce7);
+}
+
+/* Стилевые варианты */
+
+/* Rounded (по умолчанию) — мягкие пастельные тона, плавные переходы */
+[data-style='rounded'] {
+  --radius-sm: 6px;
+  --radius-md: 12px;
+  --radius-lg: 18px;
+  --radius-full: 999px;
+
+  --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.08);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.1);
+  --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.12);
+
+  --color-surface: color-mix(in srgb, var(--color-accent) 4%, var(--color-bg-primary));
+  --color-surface-hover: color-mix(in srgb, var(--color-accent) 8%, var(--color-bg-primary));
+  --color-surface-strong: color-mix(in srgb, var(--color-accent) 6%, var(--color-bg-secondary));
+  --color-border-intense: color-mix(in srgb, var(--color-accent) 30%, var(--color-border));
+  --color-highlight: color-mix(in srgb, var(--color-accent) 10%, transparent);
+
+  --gradient-surface: linear-gradient(135deg, color-mix(in srgb, var(--color-accent) 4%, var(--color-bg-primary)), var(--color-bg-primary));
+  --color-badge-bg: color-mix(in srgb, var(--color-secondary) 20%, var(--color-bg-primary));
+  --color-focus-ring: color-mix(in srgb, var(--color-accent) 40%, transparent);
+  --color-divider: color-mix(in srgb, var(--color-accent) 15%, var(--color-border-light));
+  --color-link-hover-bg: color-mix(in srgb, var(--color-accent) 6%, var(--color-bg-secondary));
+  --color-card-border: color-mix(in srgb, var(--color-accent) 20%, var(--color-border));
+  --color-highlight-text: color-mix(in srgb, var(--color-accent) 12%, transparent);
+}
+
+/* Sharp — минималистичный, монохромный акцент */
+[data-style='sharp'] {
+  --radius-sm: 0px;
+  --radius-md: 0px;
+  --radius-lg: 0px;
+  --radius-full: 0px;
+
+  --shadow-sm: 0 1px 1px rgba(0, 0, 0, 0.06);
+  --shadow-md: 0 2px 4px rgba(0, 0, 0, 0.08);
+  --shadow-lg: 0 4px 8px rgba(0, 0, 0, 0.1);
+
+  --color-surface: color-mix(in srgb, var(--color-accent) 3%, var(--color-bg-primary));
+  --color-surface-hover: color-mix(in srgb, var(--color-accent) 6%, var(--color-bg-primary));
+  --color-surface-strong: var(--color-bg-secondary);
+  --color-border-intense: var(--color-accent);
+  --color-highlight: color-mix(in srgb, var(--color-accent) 8%, transparent);
+
+  --gradient-surface: var(--color-bg-primary);
+  --color-badge-bg: var(--color-accent);
+  --color-focus-ring: var(--color-accent);
+  --color-divider: var(--color-border);
+  --color-link-hover-bg: var(--color-bg-secondary);
+  --color-card-border: var(--color-border);
+  --color-highlight-text: color-mix(in srgb, var(--color-accent) 8%, transparent);
+}
+
+/* Glass — полупрозрачные поверхности, цветной туман */
+[data-style='glass'] {
+  --radius-sm: 8px;
+  --radius-md: 16px;
+  --radius-lg: 24px;
+  --radius-full: 999px;
+
+  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.06);
+  --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.08);
+  --shadow-lg: 0 16px 48px rgba(0, 0, 0, 0.1);
+
+  --color-surface: color-mix(in srgb, var(--color-accent) 6%, transparent);
+  --color-surface-hover: color-mix(in srgb, var(--color-accent) 10%, transparent);
+  --color-surface-strong: color-mix(in srgb, var(--color-accent) 4%, var(--color-bg-secondary));
+  --color-border-intense: color-mix(in srgb, var(--color-accent) 20%, var(--color-border));
+  --color-highlight: color-mix(in srgb, var(--color-accent) 15%, transparent);
+
+  --gradient-surface: linear-gradient(135deg, color-mix(in srgb, var(--color-accent) 6%, transparent), color-mix(in srgb, var(--color-accent) 2%, transparent));
+  --color-badge-bg: color-mix(in srgb, var(--color-secondary) 20%, transparent);
+  --color-focus-ring: color-mix(in srgb, var(--color-accent) 30%, transparent);
+  --color-divider: color-mix(in srgb, var(--color-accent) 12%, var(--color-border-light));
+  --color-link-hover-bg: color-mix(in srgb, var(--color-accent) 8%, transparent);
+  --color-card-border: color-mix(in srgb, var(--color-accent) 15%, rgba(255, 255, 255, 0.2));
+  --color-highlight-text: color-mix(in srgb, var(--color-accent) 18%, transparent);
+
+  --glass-bg: color-mix(in srgb, var(--color-accent) 8%, rgba(255, 255, 255, 0.55));
+  --glass-border: color-mix(in srgb, var(--color-accent) 15%, rgba(255, 255, 255, 0.25));
+  --glass-blur: 12px;
+}
+
+[data-theme='dark'][data-style='glass'] {
+  --glass-bg: color-mix(in srgb, var(--color-accent) 12%, rgba(30, 30, 50, 0.55));
+  --glass-border: color-mix(in srgb, var(--color-accent) 20%, rgba(255, 255, 255, 0.06));
+  --color-card-border: color-mix(in srgb, var(--color-accent) 18%, rgba(255, 255, 255, 0.06));
+}
+
+/* Bold — насыщенные цвета, толстые границы, максимальный контраст */
+[data-style='bold'] {
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-full: 999px;
+
+  --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.15);
+  --shadow-md: 0 6px 16px rgba(0, 0, 0, 0.2);
+  --shadow-lg: 0 12px 40px rgba(0, 0, 0, 0.25);
+
+  --border-width: 2px;
+
+  --color-surface: color-mix(in srgb, var(--color-accent) 10%, var(--color-bg-primary));
+  --color-surface-hover: color-mix(in srgb, var(--color-accent) 18%, var(--color-bg-primary));
+  --color-surface-strong: color-mix(in srgb, var(--color-accent) 14%, var(--color-bg-secondary));
+  --color-border-intense: var(--color-accent);
+  --color-highlight: color-mix(in srgb, var(--color-accent) 20%, transparent);
+
+  --gradient-surface: linear-gradient(135deg, color-mix(in srgb, var(--color-accent) 10%, var(--color-bg-primary)), color-mix(in srgb, var(--color-secondary) 6%, var(--color-bg-primary)));
+  --color-badge-bg: color-mix(in srgb, var(--color-accent) 30%, var(--color-bg-primary));
+  --color-focus-ring: color-mix(in srgb, var(--color-accent) 50%, transparent);
+  --color-divider: color-mix(in srgb, var(--color-accent) 25%, var(--color-border));
+  --color-link-hover-bg: color-mix(in srgb, var(--color-accent) 12%, var(--color-bg-secondary));
+  --color-card-border: var(--color-accent);
+  --color-highlight-text: color-mix(in srgb, var(--color-accent) 22%, transparent);
+}
+
+[data-theme='dark'][data-style='bold'] {
+  --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 6px 16px rgba(0, 0, 0, 0.4);
+  --shadow-lg: 0 12px 40px rgba(0, 0, 0, 0.5);
+  --color-surface: color-mix(in srgb, var(--color-accent) 14%, var(--color-bg-primary));
+  --color-surface-hover: color-mix(in srgb, var(--color-accent) 22%, var(--color-bg-primary));
+  --color-surface-strong: color-mix(in srgb, var(--color-accent) 18%, var(--color-bg-secondary));
+}

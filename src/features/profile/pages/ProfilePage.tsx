@@ -168,7 +168,7 @@ export function ProfilePage() {
   const fullName = [p?.firstName, p?.lastName].filter(Boolean).join(' ')
   const formattedDate = p?.birthDate ? new Date(p.birthDate).toLocaleDateString('ru-RU') : null
 
-  return (
+  return (<>
     <div className={styles.page}>
       <div className={styles.profileGrid}>
         {/* Левая колонка */}
@@ -249,7 +249,7 @@ export function ProfilePage() {
         </div>
       </div>
     </div>
-  )
+  </>)
 
   // ---------- Вспомогательные функции ----------
   function renderField(label: string, value: string | null, privacy?: PrivacyLevel) {

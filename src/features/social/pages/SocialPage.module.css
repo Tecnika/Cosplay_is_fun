@@ -69,13 +69,13 @@
   align-items: center;
   justify-content: space-between;
   padding: var(--spacing-md);
-  background-color: var(--color-bg-card);
-  border: 1px solid var(--color-border);
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-card-border);
   border-radius: var(--radius-md);
-  transition: border-color var(--transition-fast);
+  transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
 }
 
-.card:hover { border-color: var(--color-accent); }
+.card:hover { border-color: var(--color-accent); box-shadow: var(--shadow-sm); }
 
 .cardLink {
   display: flex;
@@ -126,8 +126,8 @@
   align-items: flex-start;
   gap: var(--spacing-md);
   padding: var(--spacing-md);
-  background-color: var(--color-bg-card);
-  border: 1px solid var(--color-border);
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-card-border);
   border-radius: var(--radius-lg);
   text-decoration: none;
   color: inherit;
@@ -136,7 +136,7 @@
 
 .circleCard:hover {
   border-color: var(--color-accent);
-  box-shadow: var(--shadow-sm);
+  box-shadow: var(--shadow-md);
 }
 
 .circleCardBody {
@@ -270,8 +270,8 @@
 
 .memberCard {
   padding: var(--spacing-md);
-  background-color: var(--color-bg-card);
-  border: 1px solid var(--color-border);
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-card-border);
   border-radius: var(--radius-md);
 }
 
@@ -311,6 +311,7 @@
 .field input:focus, .field textarea:focus {
   outline: none;
   border-color: var(--color-accent);
+  box-shadow: 0 0 0 3px var(--color-focus-ring);
 }
 
 .submitBtn {
@@ -388,14 +389,14 @@
   align-items: center;
   gap: var(--spacing-sm);
   padding: var(--spacing-lg) var(--spacing-md);
-  background-color: var(--color-bg-card);
-  border: 1px solid var(--color-border);
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-card-border);
   border-radius: var(--radius-lg);
   text-align: center;
-  transition: border-color var(--transition-fast);
+  transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
 }
 
-.userCard:hover { border-color: var(--color-accent); }
+.userCard:hover { border-color: var(--color-accent); box-shadow: var(--shadow-sm); }
 
 .userCardLink {
   display: flex;

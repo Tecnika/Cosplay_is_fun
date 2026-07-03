@@ -63,7 +63,7 @@
 /* Ник */
 .nickRow {
   padding-bottom: var(--spacing-sm);
-  border-bottom: 1px solid var(--color-border-light);
+  border-bottom: 2px solid var(--color-divider);
 }
 
 .nick {
@@ -100,12 +100,13 @@
   font-size: var(--font-size-lg);
   margin-bottom: var(--spacing-sm);
   padding-bottom: var(--spacing-xs);
-  border-bottom: 1px solid var(--color-border-light);
+  border-bottom: 2px solid var(--color-divider);
 }
 
 .bioSection {
   padding: var(--spacing-md);
-  background-color: var(--color-bg-secondary);
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-card-border);
   border-radius: var(--radius-lg);
 }
 
@@ -118,7 +119,8 @@
 
 .socialSection {
   padding: var(--spacing-md);
-  background-color: var(--color-bg-secondary);
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-card-border);
   border-radius: var(--radius-lg);
 }
 

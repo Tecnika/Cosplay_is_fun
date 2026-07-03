@@ -1,4 +1,5 @@
 @import './variables.css';
+@import './themes.css';
 
 /* Анимации */
 @keyframes fadeIn {
@@ -31,8 +32,18 @@ body {
   font-size: var(--font-size-md);
   color: var(--color-text-primary);
   background-color: var(--color-bg-primary);
+  background-image: var(--gradient-surface);
   transition: background-color var(--transition-normal), color var(--transition-normal);
   min-height: 100vh;
+}
+
+::selection {
+  background-color: var(--color-highlight-text);
+}
+
+:focus-visible {
+  outline: 2px solid var(--color-focus-ring);
+  outline-offset: 2px;
 }
 
 a {

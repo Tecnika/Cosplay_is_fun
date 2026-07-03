@@ -3,10 +3,10 @@
   top: 0;
   z-index: 100;
   height: var(--header-height);
-  background-color: var(--color-bg-primary);
-  border-bottom: 1px solid var(--color-border);
+  background-color: var(--color-surface);
+  border-bottom: 1px solid var(--color-divider);
   backdrop-filter: blur(8px);
-  transition: background-color var(--transition-normal);
+  transition: background-color var(--transition-normal), border-color var(--transition-normal);
 }
 
 .inner {
@@ -21,13 +21,77 @@
 }
 
 .logo {
-  font-size: var(--font-size-xl);
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  text-decoration: none;
+}
+
+.logoIcon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  background: var(--gradient-primary);
+  border-radius: var(--radius-md);
+  color: white;
+  flex-shrink: 0;
+}
+
+.wandStar {
+  animation: starGlow 2s ease-in-out infinite;
+}
+
+@keyframes starGlow {
+  0%, 100% { fill: var(--color-accent); stroke: var(--color-accent); }
+  33% { fill: var(--color-secondary); stroke: var(--color-secondary); }
+  66% { fill: #ffd700; stroke: #ffd700; }
+}
+
+.logoText {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.2;
+}
+
+.logoTitle {
+  font-size: var(--font-size-md);
   font-weight: 700;
   background: var(--gradient-primary);
   -webkit-background-clip: text;
   background-clip: text;
   -webkit-text-fill-color: transparent;
   white-space: nowrap;
+}
+
+.logoAccent {
+  background: var(--gradient-accent);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.logoSub {
+  font-size: 0.65rem;
+  color: var(--color-text-tertiary);
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.logoSparkle {
+  font-size: 0.8rem;
+  color: var(--color-secondary);
+  opacity: 0.7;
+  align-self: flex-start;
+  margin-top: 2px;
+  animation: sparkle 2s ease-in-out infinite;
+}
+
+@keyframes sparkle {
+  0%, 100% { opacity: 0.7; transform: scale(1); }
+  50% { opacity: 1; transform: scale(1.3); }
 }
 
 .nav {
@@ -46,7 +110,7 @@
 
 .link:hover {
   color: var(--color-text-primary);
-  background-color: var(--color-bg-secondary);
+  background-color: var(--color-link-hover-bg);
 }
 
 .actions {
@@ -91,14 +155,16 @@
   align-items: center;
   gap: var(--spacing-sm);
   padding: var(--spacing-xs) var(--spacing-md);
-  border: 1px solid var(--color-border);
+  border: 1px solid var(--color-border-intense);
   border-radius: var(--radius-full);
-  transition: border-color var(--transition-fast);
+  background-color: var(--color-surface);
+  transition: border-color var(--transition-fast), background-color var(--transition-fast);
   text-decoration: none;
 }
 
 .profileLink:hover {
   border-color: var(--color-accent);
+  background-color: var(--color-surface-hover);
 }
 
 .nick {
@@ -111,17 +177,48 @@
   white-space: nowrap;
 }
 
-.logoutBtn {
-  padding: var(--spacing-sm) var(--spacing-lg);
-  border: 1px solid var(--color-error);
-  border-radius: var(--radius-full);
+.profileDropdown {
+  position: relative;
+}
+
+.profileDropdown:hover .dropdownMenu {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+
+.dropdownMenu {
+  position: absolute;
+  top: calc(100% + 6px);
+  right: 0;
+  min-width: 180px;
+  padding: var(--spacing-xs);
+  background-color: var(--color-bg-card);
+  border: 1px solid var(--color-card-border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-4px);
+  transition: opacity var(--transition-fast), transform var(--transition-fast), visibility var(--transition-fast);
+  z-index: 200;
+}
+
+.dropdownItem {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  width: 100%;
+  padding: var(--spacing-sm) var(--spacing-md);
+  border-radius: var(--radius-md);
   font-size: var(--font-size-sm);
   font-weight: 500;
-  color: var(--color-error);
+  color: var(--color-text-primary);
+  text-decoration: none;
   transition: background-color var(--transition-fast), color var(--transition-fast);
 }
 
-.logoutBtn:hover {
-  background-color: var(--color-error);
-  color: white;
+.dropdownItem:hover {
+  background-color: var(--color-surface-hover);
+  color: var(--color-accent);
 }
