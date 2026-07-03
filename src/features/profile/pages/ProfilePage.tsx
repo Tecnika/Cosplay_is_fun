@@ -278,7 +278,7 @@ export function ProfilePage() {
   }
 
   function renderBio() {
-    if (p?.bio && isFieldVisible(p.bioPrivacy, viewMode, isFriend)) {
+    if (p?.bio && isFieldVisible(p.bioPrivacy, viewMode, isFriend, hasCommonCircle)) {
       return (
         <div className={styles.bioSection}>
           <h3 className={styles.sectionTitle}>О себе</h3>
@@ -291,7 +291,7 @@ export function ProfilePage() {
         </div>
       )
     }
-    if (p?.bio && !isFieldVisible(p.bioPrivacy, viewMode, isFriend)) {
+    if (p?.bio && !isFieldVisible(p.bioPrivacy, viewMode, isFriend, hasCommonCircle)) {
       return (
         <div className={styles.bioSection}>
           <h3 className={styles.sectionTitle}>О себе</h3>

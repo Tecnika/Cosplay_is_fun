@@ -1,4 +1,4 @@
-import { doc, getDoc, updateDoc, serverTimestamp, query, where, orderBy, limit, getDocs, collection } from 'firebase/firestore'
+import { doc, getDoc, updateDoc, serverTimestamp, query, where, limit, getDocs, collection } from 'firebase/firestore'
 import { getFirebaseDb } from '@/services/firebase'
 import type { UserProfile, PrivacyLevel } from '@/types'
 
@@ -19,19 +19,19 @@ export async function getProfileByUsername(username: string): Promise<UserProfil
   return { id: snap.docs[0].id, ...snap.docs[0].data() } as UserProfile
 }
 
-/** Ищет пользователей по префиксу displayName */
+/** Ищет пользователей по префиксу displayName (case-insensitive) */
 export async function searchUsers(q: string, max = 20): Promise<UserProfile[]> {
   const db = getFirebaseDb()
   if (q.length < 1) return []
   const lower = q.toLowerCase()
   const snap = await getDocs(query(
     collection(db, 'users'),
-    orderBy('displayName'),
     where('displayName', '>=', lower),
     where('displayName', '<', lower + '~'),
-    limit(max),
+    limit(max * 3),
   ))
-  return snap.docs.map((d) => ({ id: d.id, ...d.data() }) as UserProfile)
+  const all = snap.docs.map((d) => ({ id: d.id, ...d.data() }) as UserProfile)
+  return all.filter((u) => u.displayName.toLowerCase().includes(lower)).slice(0, max)
 }
 
 /** Обновляет профиль */

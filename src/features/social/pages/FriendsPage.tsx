@@ -12,7 +12,7 @@ type Tab = 'friends' | 'incoming' | 'outgoing'
 
 export function FriendsPage() {
   const { user } = useAuth()
-  const { friends, incoming, outgoing, loading } = useFriends(user?.uid)
+  const { friends, incoming, outgoing, loading, refresh } = useFriends(user?.uid)
   const [tab, setTab] = useState<Tab>('friends')
 
   if (!user) return <PageShell requiredAuth isAuthenticated={false} />
@@ -20,13 +20,13 @@ export function FriendsPage() {
   async function handleAccept(friendId: string) {
     if (!user) return
     await acceptFriendRequest(user.uid, friendId)
-    window.location.reload()
+    await refresh()
   }
 
   async function handleRemove(friendId: string) {
     if (!user) return
     await removeFriendship(user.uid, friendId)
-    window.location.reload()
+    await refresh()
   }
 
   const tabs: { key: Tab; label: string; count: number }[] = [
