@@ -1,4 +1,5 @@
 import BoringAvatar from 'boring-avatars'
+import type { AvatarVariant } from '@/types'
 import styles from './Avatar.module.css'
 
 interface AvatarProps {
@@ -10,9 +11,11 @@ interface AvatarProps {
   size?: number
   /** CSS-класс */
   className?: string
-  /** Вариант boring-avatar */
-  variant?: 'marble' | 'beam' | 'bauhaus' | 'ring' | 'sunset' | 'geometric' | 'abstract' | 'pixel'
+  /** Вариант boring-avatar (по умолчанию из настроек пользователя) */
+  variant?: AvatarVariant
 }
+
+const AVATAR_KEY = 'cosplay-avatar'
 
 /** Палитра для светлой темы */
 const LIGHT_PALETTE = ['#6c5ce7', '#a29bfe', '#fd79a8', '#00b894', '#fdcb6e']
@@ -28,7 +31,17 @@ function getThemePalette(): string[] {
   return LIGHT_PALETTE
 }
 
-export function Avatar({ name, url, size = 48, className, variant = 'marble' }: AvatarProps) {
+/** Читает предпочтения аватара из localStorage */
+function getAvatarVariant(): AvatarVariant {
+  try {
+    return (localStorage.getItem(AVATAR_KEY) as AvatarVariant) || 'beam'
+  } catch {
+    return 'beam'
+  }
+}
+
+export function Avatar({ name, url, size = 48, className, variant: propVariant }: AvatarProps) {
+  const variant = propVariant || getAvatarVariant()
   const palette = getThemePalette()
 
   if (url) {
