@@ -7,6 +7,8 @@ import { useProfile } from '../hooks/useProfile'
 import { getProfileByUsername, updateProfile, isFieldVisible } from '../services/profileService'
 import { FriendButton } from '@/features/social/components/FriendButton'
 import { UserPreview } from '@/features/social/components/UserPreview'
+import { useProjects } from '@/features/planner/hooks/useProjects'
+import { ProjectCard } from '@/features/planner/components/ProjectCard'
 import { CircleAvatar } from '@/components/ui/CircleAvatar'
 import { getFriendship, getUserFriendships, getFriendId } from '@/features/social/services/friendsService'
 import { getUserCircles, haveCommonCircle } from '@/features/social/services/circlesService'
@@ -34,6 +36,7 @@ export function ProfilePage() {
   const [profileCircles, setProfileCircles] = useState<Circle[]>([])
 
   const p = otherProfile || loadedProfile || myProfile
+  const { projects: profileProjects } = useProjects(p?.id)
   const currentName = p?.displayName || user?.displayName || 'Пользователь'
 
   // Определяем режим просмотра
@@ -239,12 +242,19 @@ export function ProfilePage() {
             </div>
 
           <div className={styles.projectsSection}>
-            <h3 className={styles.sectionTitle}>Проекты</h3>
-            <p className={styles.placeholder}>
-              {viewMode === 'self'
-                ? 'Создайте первый косплей-проект в Планировщике'
-                : 'Нет проектов'}
-            </p>
+            <h3 className={styles.sectionTitle}>
+              <Link to="/planner" style={{ color: 'inherit', textDecoration: 'none' }}>Проекты</Link>
+            </h3>
+            {profileProjects.length === 0 && (
+              <p className={styles.placeholder}>
+                {viewMode === 'self'
+                  ? 'Создайте первый косплей-проект в Мастерской'
+                  : 'Нет проектов'}
+              </p>
+            )}
+            <div className={styles.projectsGrid}>
+              {profileProjects.map((pr) => <ProjectCard key={pr.id} project={pr} />)}
+            </div>
           </div>
         </div>
       </div>
@@ -278,7 +288,7 @@ export function ProfilePage() {
   }
 
   function renderBio() {
-    if (p?.bio && isFieldVisible(p.bioPrivacy, viewMode, isFriend)) {
+    if (p?.bio && isFieldVisible(p.bioPrivacy, viewMode, isFriend, hasCommonCircle)) {
       return (
         <div className={styles.bioSection}>
           <h3 className={styles.sectionTitle}>О себе</h3>
@@ -291,7 +301,7 @@ export function ProfilePage() {
         </div>
       )
     }
-    if (p?.bio && !isFieldVisible(p.bioPrivacy, viewMode, isFriend)) {
+    if (p?.bio && !isFieldVisible(p.bioPrivacy, viewMode, isFriend, hasCommonCircle)) {
       return (
         <div className={styles.bioSection}>
           <h3 className={styles.sectionTitle}>О себе</h3>

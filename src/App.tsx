@@ -7,6 +7,14 @@ import { LoginPage } from '@/features/auth/pages/LoginPage'
 import { RegisterPage } from '@/features/auth/pages/RegisterPage'
 import { ProfilePage } from '@/features/profile/pages/ProfilePage'
 import { SettingsPage } from '@/features/profile/pages/SettingsPage'
+import { WorkshopPage } from '@/features/planner/pages/WorkshopPage'
+import { ProjectNewPage } from '@/features/planner/pages/ProjectNewPage'
+import { ProjectPage } from '@/features/planner/pages/ProjectPage'
+import { ProjectEditPage } from '@/features/planner/pages/ProjectEditPage'
+import { CostumeNewPage } from '@/features/planner/pages/CostumeNewPage'
+import { CostumePage } from '@/features/planner/pages/CostumePage'
+import { PropNewPage } from '@/features/planner/pages/PropNewPage'
+import { PropPage } from '@/features/planner/pages/PropPage'
 import { FriendsPage } from '@/features/social/pages/FriendsPage'
 import { FindUsersPage } from '@/features/social/pages/FindUsersPage'
 import { UsersPage } from '@/features/social/pages/UsersPage'
@@ -43,7 +51,14 @@ export function App() {
             <Route path="/auth" element={<LoginPage />} />
             <Route path="/auth/register" element={<RegisterPage />} />
 
-            <Route path="/planner" element={<div>Планировщик (в разработке)</div>} />
+            <Route path="/planner" element={<WorkshopPage />} />
+            <Route path="/planner/new" element={<ProjectNewPage />} />
+            <Route path="/planner/project/:id" element={<ProjectPage />} />
+            <Route path="/planner/project/:id/edit" element={<ProjectEditPage />} />
+            <Route path="/planner/costume/new" element={<CostumeNewPage />} />
+            <Route path="/planner/costume/:id" element={<CostumePage />} />
+            <Route path="/planner/prop/new" element={<PropNewPage />} />
+            <Route path="/planner/prop/:id" element={<PropPage />} />
             <Route path="/social/users" element={<UsersPage />} />
             <Route path="/social" element={<FriendsPage />} />
             <Route path="/social/friends" element={<FriendsPage />} />

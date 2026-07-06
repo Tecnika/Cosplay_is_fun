@@ -1,5 +1,6 @@
+import { useState, useRef, useEffect } from 'react'
 import { Link } from 'react-router-dom'
-import type { Theme } from '@/types'
+import type { Theme, AppNotification } from '@/types'
 import { Avatar } from '@/features/profile/components/Avatar'
 import styles from './Header.module.css'
 
@@ -10,9 +11,26 @@ interface HeaderProps {
   userName?: string
   userAvatar?: string
   onLogout?: () => void
+  unreadCount?: number
+  notifications?: AppNotification[]
+  onMarkRead?: (id: string) => Promise<void>
+  onMarkAllRead?: () => Promise<void>
 }
 
-export function Header({ theme, onToggleTheme, isAuthenticated, userName, userAvatar, onLogout }: HeaderProps) {
+export function Header({ theme, onToggleTheme, isAuthenticated, userName, userAvatar, onLogout, unreadCount = 0, notifications = [], onMarkRead, onMarkAllRead }: HeaderProps) {
+  const [notifOpen, setNotifOpen] = useState(false)
+  const notifRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    function handleClick(e: MouseEvent) {
+      if (notifRef.current && !notifRef.current.contains(e.target as Node)) {
+        setNotifOpen(false)
+      }
+    }
+    document.addEventListener('mousedown', handleClick)
+    return () => document.removeEventListener('mousedown', handleClick)
+  }, [])
+
   return (
     <header className={styles.header}>
       <div className={styles.inner}>
@@ -40,11 +58,37 @@ export function Header({ theme, onToggleTheme, isAuthenticated, userName, userAv
               <Link to="/social/circles" className={styles.link}>Круги</Link>
             </>
           )}
-          <Link to="/planner" className={styles.link}>Планировщик</Link>
+          <Link to="/planner" className={styles.link}>Мастерская</Link>
           <Link to="/gallery" className={styles.link}>Галерея</Link>
         </nav>
 
         <div className={styles.actions}>
+          {isAuthenticated && (
+            <div className={styles.notifWrap} ref={notifRef}>
+              <button className={styles.notifBtn} onClick={() => setNotifOpen(!notifOpen)}>
+                🔔
+                {unreadCount > 0 && <span className={styles.notifBadge}>{unreadCount}</span>}
+              </button>
+              {notifOpen && (
+                <div className={styles.notifDropdown}>
+                  <div className={styles.notifHeader}>
+                    <span>Уведомления</span>
+                    {unreadCount > 0 && onMarkAllRead && (
+                      <button onClick={onMarkAllRead} className={styles.notifMarkAll}>Прочитать все</button>
+                    )}
+                  </div>
+                  {notifications.length === 0 && <div className={styles.notifEmpty}>Нет уведомлений</div>}
+                  {notifications.slice(0, 10).map((n) => (
+                    <div key={n.id} className={`${styles.notifItem} ${!n.read ? styles.notifUnread : ''}`} onClick={() => onMarkRead?.(n.id)}>
+                      <div className={styles.notifMsg}>{n.message}</div>
+                      <div className={styles.notifDate}>{new Date(n.createdAt).toLocaleDateString('ru-RU')}</div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
+
           <button
             onClick={onToggleTheme}
             className={styles.themeBtn}

@@ -1,4 +1,4 @@
-import { doc, getDoc, getDocs, setDoc, addDoc, updateDoc, deleteDoc, query, where, serverTimestamp, collection } from 'firebase/firestore'
+import { doc, getDoc, getDocs, setDoc, addDoc, updateDoc, deleteDoc, query, where, serverTimestamp, collection, collectionGroup } from 'firebase/firestore'
 import { getFirebaseDb } from '@/services/firebase'
 import { getProfileById } from '@/features/profile/services/profileService'
 import type { Circle, CircleMember, CircleRole } from '../types'
@@ -175,12 +175,9 @@ export async function createInvite(circleId: string, uid: string): Promise<strin
 /** Найти круг по коду приглашения */
 export async function getCircleByInviteCode(code: string): Promise<Circle | null> {
   const db = getFirebaseDb()
-  const circles = await getDocs(collection(db, 'circles'))
-  for (const circleDoc of circles.docs) {
-    const invites = await getDocs(query(collection(db, 'circles', circleDoc.id, 'invites'), where('code', '==', code)))
-    if (!invites.empty) {
-      return { id: circleDoc.id, ...circleDoc.data() } as Circle
-    }
-  }
-  return null
+  const invitesSnap = await getDocs(query(collectionGroup(db, 'invites'), where('code', '==', code)))
+  if (invitesSnap.empty) return null
+  const circleId = invitesSnap.docs[0].ref.parent.parent?.id
+  if (!circleId) return null
+  return getCircle(circleId)
 }

@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import type { Friendship, FriendRelation } from '../types'
 import { getUserFriendships, getFriendId } from '../services/friendsService'
 
@@ -13,21 +13,24 @@ interface UseFriendsResult {
   incoming: FriendWithRelation[]
   outgoing: FriendWithRelation[]
   loading: boolean
+  refresh: () => Promise<void>
 }
 
 export function useFriends(uid: string | undefined): UseFriendsResult {
   const [friendships, setFriendships] = useState<Friendship[]>([])
   const [loading, setLoading] = useState(true)
 
-  useEffect(() => {
-    if (!uid) { setLoading(false); return }
-
-    let cancelled = false
-    getUserFriendships(uid).then((data) => {
-      if (!cancelled) { setFriendships(data); setLoading(false) }
-    })
-    return () => { cancelled = true }
+  const fetchFriendships = useCallback(async () => {
+    if (!uid) { setFriendships([]); setLoading(false); return }
+    setLoading(true)
+    const data = await getUserFriendships(uid)
+    setFriendships(data)
+    setLoading(false)
   }, [uid])
+
+  useEffect(() => {
+    fetchFriendships()
+  }, [fetchFriendships])
 
   const friends = friendships
     .filter((f) => f.status === 'accepted')
@@ -41,5 +44,5 @@ export function useFriends(uid: string | undefined): UseFriendsResult {
     .filter((f) => f.status === 'pending' && f.actionUser === uid)
     .map((f) => ({ friendship: f, friendId: getFriendId(f, uid!), relation: 'subscribed' as FriendRelation }))
 
-  return { friends, incoming, outgoing, loading }
+  return { friends, incoming, outgoing, loading, refresh: fetchFriendships }
 }

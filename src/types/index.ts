@@ -119,8 +119,118 @@ export type ColorTheme = 'cosplay' | 'ocean' | 'sunset' | 'forest'
 /** Стилевой вариант */
 export type StyleVariant = 'rounded' | 'sharp' | 'glass' | 'bold'
 
+/** Уведомление */
+export interface AppNotification {
+  id: string
+  userId: string
+  type: 'member_added' | 'project_updated'
+  projectId: string
+  projectTitle: string
+  message: string
+  read: boolean
+  createdAt: number
+}
+
 /** Настройки дизайна */
 export interface DesignSettings {
   colorTheme: ColorTheme
   styleVariant: StyleVariant
+}
+
+// ====== Мастерская косплеера ======
+
+/** Референс — фото с подписью (часть образа) */
+export interface Reference {
+  id: string
+  label: string
+  url: string
+}
+
+/** Элемент списка покупок */
+export interface ShoppingItem {
+  id: string
+  item: string
+  forWhat: string
+  link?: string
+  price?: number
+  quantity: number
+  userId: string
+  sourceType: 'costume' | 'prop' | 'project'
+  sourceId: string
+  linkedTo: string[]
+  status?: ShoppingItemStatus
+  statusNote?: string
+  createdAt: number
+}
+
+/** Статус задачи в плане работ */
+export type TaskStatus = 'pending' | 'in_progress' | 'completed'
+
+/** Статус покупки */
+export type ShoppingItemStatus = 'to_buy' | 'ordered' | 'bought' | 'wasted'
+
+/** Узел дерева работ (рекурсивный) */
+export interface TaskNode {
+  id: string
+  title: string
+  description?: string
+  status: TaskStatus
+  deadline?: number
+  milestone: boolean
+  referenceIds: string[]
+  shoppingItemIds: string[]
+  children: TaskNode[]
+}
+
+/** Образ — центральная сущность мастерской */
+export interface Costume {
+  id: string
+  userId: string
+  assignedTo?: string
+  title: string
+  character: string
+  characterAttributes: string[]
+  projectDate: number
+  targetDate?: number
+  imageUrl: string
+  tags: string[]
+  references: Reference[]
+  workPlan: TaskNode[]
+  createdAt: number
+  updatedAt?: number
+}
+
+/** Тип проекта: личный или групповой */
+export type ProjectType = 'personal' | 'group'
+
+/** Проект — группировка образов и реквизита с участниками */
+export interface WorkshopProject {
+  id: string
+  title: string
+  description?: string
+  type: ProjectType
+  isPublic: boolean
+  ownerId: string
+  members: string[]
+  deadline?: number
+  completedAt?: number
+  createdAt: number
+  updatedAt?: number
+}
+
+/** Реквизит — элемент костюма или декорации */
+export interface WorkshopProp {
+  id: string
+  userId: string
+  assignedTo?: string
+  title: string
+  description: string
+  quantity: number
+  imageUrl: string
+  tags: string[]
+  isConsumable: boolean
+  references: Reference[]
+  workPlan: TaskNode[]
+  createdAt: number
+  updatedAt?: number
 }
