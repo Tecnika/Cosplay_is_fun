@@ -41,13 +41,25 @@ export async function getCollection<T = DocumentData>(
   return snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }) as T)
 }
 
+/** Удалить ключи со значением undefined (Firestore не принимает undefined) */
+function stripUndefined(data: Record<string, unknown>): Record<string, unknown> {
+  const clean: Record<string, unknown> = {}
+  for (const [key, value] of Object.entries(data)) {
+    if (value !== undefined) {
+      clean[key] = value
+    }
+  }
+  return clean
+}
+
 /** Создать документ (авто-ID) */
 export async function createDocument<T = DocumentData>(
   collectionName: string,
   data: T,
 ): Promise<string> {
   const db = getFirebaseDb()
-  const docRef = await addDoc(collection(db, collectionName), data as DocumentData)
+  const clean = stripUndefined(data as Record<string, unknown>)
+  const docRef = await addDoc(collection(db, collectionName), clean)
   return docRef.id
 }
 
@@ -59,7 +71,8 @@ export async function updateDocument<T = DocumentData>(
 ): Promise<void> {
   const db = getFirebaseDb()
   const docRef = doc(db, collectionName, docId)
-  await updateDoc(docRef, data as DocumentData)
+  const clean = stripUndefined(data as Record<string, unknown>)
+  await updateDoc(docRef, clean)
 }
 
 /** Удалить документ */

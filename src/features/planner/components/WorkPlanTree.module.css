@@ -1,0 +1,168 @@
+.block {
+  margin-bottom: var(--spacing-lg);
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--spacing-sm);
+}
+
+.title {
+  margin: 0;
+  font-size: var(--font-size-lg);
+  color: var(--color-text-primary);
+}
+
+.addBtn {
+  padding: var(--spacing-xs) var(--spacing-md);
+  background: var(--color-accent-light);
+  color: var(--color-accent);
+  border: 1px solid var(--color-accent);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  font-size: var(--font-size-sm);
+}
+
+.addBtn:hover {
+  background: var(--color-accent);
+  color: var(--color-text-inverse);
+}
+
+.empty {
+  color: var(--color-text-tertiary);
+  font-style: italic;
+  font-size: var(--font-size-sm);
+}
+
+.node {
+  margin-left: var(--spacing-lg);
+  margin-bottom: var(--spacing-sm);
+  padding: var(--spacing-sm);
+  border-left: 2px solid var(--color-border);
+  background: var(--color-bg-secondary);
+  border-radius: var(--radius-sm);
+}
+
+.nodeHeader {
+  display: flex;
+  gap: var(--spacing-sm);
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.nodeTitle {
+  flex: 1;
+  min-width: 150px;
+  padding: var(--spacing-sm);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  background: var(--color-bg-primary);
+  color: var(--color-text-primary);
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+}
+
+.statusSelect {
+  padding: var(--spacing-xs) var(--spacing-sm);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  background: var(--color-bg-primary);
+  color: var(--color-text-primary);
+  font-size: var(--font-size-xs);
+}
+
+.milestoneLabel {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: var(--font-size-xs);
+  color: var(--color-text-secondary);
+  white-space: nowrap;
+}
+
+.dateInput {
+  padding: var(--spacing-xs) var(--spacing-sm);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  background: var(--color-bg-primary);
+  color: var(--color-text-primary);
+  font-size: var(--font-size-xs);
+}
+
+.nodeDesc {
+  width: 100%;
+  margin-top: var(--spacing-xs);
+  padding: var(--spacing-sm);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  background: var(--color-bg-primary);
+  color: var(--color-text-primary);
+  font-size: var(--font-size-sm);
+  resize: vertical;
+  box-sizing: border-box;
+}
+
+.attachments {
+  margin-top: var(--spacing-xs);
+  display: flex;
+  gap: var(--spacing-md);
+  flex-wrap: wrap;
+}
+
+.attachGroup {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-xs);
+  align-items: center;
+}
+
+.attachLabel {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-tertiary);
+}
+
+.attachItem {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  font-size: var(--font-size-xs);
+  padding: 2px 6px;
+  background: var(--color-bg-primary);
+  border: 1px solid var(--color-border-light);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+}
+
+.addChildBtn {
+  margin-top: var(--spacing-xs);
+  padding: 2px var(--spacing-sm);
+  font-size: var(--font-size-xs);
+  background: transparent;
+  border: 1px dashed var(--color-border);
+  border-radius: var(--radius-sm);
+  color: var(--color-text-secondary);
+  cursor: pointer;
+}
+
+.addChildBtn:hover {
+  border-color: var(--color-accent);
+  color: var(--color-accent);
+}
+
+.children {
+  margin-top: var(--spacing-sm);
+}
+
+.removeBtn {
+  flex-shrink: 0;
+  width: 24px;
+  height: 24px;
+  border: none;
+  background: var(--color-error);
+  color: #fff;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  font-size: 10px;
+}

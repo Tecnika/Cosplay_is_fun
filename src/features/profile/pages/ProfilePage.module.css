@@ -328,6 +328,13 @@
   font-size: var(--font-size-sm);
 }
 
+.projectsGrid {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+  margin-top: var(--spacing-sm);
+}
+
 @media (max-width: 700px) {
   .profileGrid {
     grid-template-columns: 1fr;
