@@ -119,6 +119,9 @@ export type ColorTheme = 'cosplay' | 'ocean' | 'sunset' | 'forest'
 /** Стилевой вариант */
 export type StyleVariant = 'rounded' | 'sharp' | 'glass' | 'bold'
 
+/** Вариант аватара по умолчанию (boring-avatars) */
+export type AvatarVariant = 'marble' | 'beam' | 'bauhaus' | 'ring' | 'sunset' | 'geometric' | 'abstract' | 'pixel'
+
 /** Уведомление */
 export interface AppNotification {
   id: string
@@ -135,6 +138,7 @@ export interface AppNotification {
 export interface DesignSettings {
   colorTheme: ColorTheme
   styleVariant: StyleVariant
+  avatarVariant: AvatarVariant
 }
 
 // ====== Мастерская косплеера ======

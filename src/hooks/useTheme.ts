@@ -1,9 +1,10 @@
 import { useState, useEffect, useCallback } from 'react'
-import type { Theme, ColorTheme, StyleVariant, DesignSettings } from '@/types'
+import type { Theme, ColorTheme, StyleVariant, AvatarVariant, DesignSettings } from '@/types'
 
 const STORAGE_KEY = 'cosplay-theme'
 const COLOR_KEY = 'cosplay-color'
 const STYLE_KEY = 'cosplay-style'
+const AVATAR_KEY = 'cosplay-avatar'
 
 export function useTheme() {
   const [theme, setThemeState] = useState<Theme>(() => {
@@ -15,9 +16,10 @@ export function useTheme() {
       return {
         colorTheme: (localStorage.getItem(COLOR_KEY) as ColorTheme) ?? 'cosplay',
         styleVariant: (localStorage.getItem(STYLE_KEY) as StyleVariant) ?? 'rounded',
+        avatarVariant: (localStorage.getItem(AVATAR_KEY) as AvatarVariant) ?? 'beam',
       }
     } catch {
-      return { colorTheme: 'cosplay', styleVariant: 'rounded' }
+      return { colorTheme: 'cosplay', styleVariant: 'rounded', avatarVariant: 'beam' }
     }
   })
 
@@ -31,6 +33,7 @@ export function useTheme() {
     document.documentElement.setAttribute('data-style', design.styleVariant)
     try { localStorage.setItem(COLOR_KEY, design.colorTheme) } catch {}
     try { localStorage.setItem(STYLE_KEY, design.styleVariant) } catch {}
+    try { localStorage.setItem(AVATAR_KEY, design.avatarVariant) } catch {}
   }, [design])
 
   const toggleTheme = useCallback(() => {

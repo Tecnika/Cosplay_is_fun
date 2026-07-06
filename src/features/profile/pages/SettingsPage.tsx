@@ -18,8 +18,11 @@ export function SettingsPage() {
           <DesignSettings
             colorTheme={design.colorTheme}
             styleVariant={design.styleVariant}
+            avatarVariant={design.avatarVariant}
+            userName={profile.displayName || 'User'}
             onColorChange={(t) => setDesign({ colorTheme: t })}
             onStyleChange={(s) => setDesign({ styleVariant: s })}
+            onAvatarChange={(v) => setDesign({ avatarVariant: v })}
           />
         </section>
       </div>
